@@ -1,4 +1,5 @@
-﻿using Annex;
+﻿using System;
+using Annex;
 using Annex.Data.Shared;
 using Annex.Graphics;
 
@@ -44,6 +45,10 @@ namespace Game.Models.Chunks
             Debug.Assert(y < Y_Tiles);
 
             return this.Tiles[X_Tiles * y + x];
+        }
+
+        public Tile GetTile(int i) {
+            return GetTile(i % X_Tiles, i / X_Tiles);
         }
     }
 }

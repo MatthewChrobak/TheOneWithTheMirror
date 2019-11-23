@@ -10,17 +10,21 @@ namespace Game.Models.Chunks
         public const int TileHeight = 32;
         private Vector _renderOffset;
 
+        public String TextureName;
+        public IntRect Rect;
         private readonly TextureContext _tileSprite;
 
         public Tile(Vector renderOffset, int x, int y) {
             this._renderOffset = renderOffset;
 
-            this._tileSprite = new TextureContext("grasstiles.png") {
+            this.TextureName = new String("grasstiles.png");
+            this.Rect = new IntRect(0, 64, 32, 32);
+            this._tileSprite = new TextureContext(this.TextureName) {
                 RenderPosition = new OffsetVector(
                     new ScalingVector(Vector.Create(x, y),
                     TileWidth, TileHeight),
                     _renderOffset),
-                SourceTextureRect =  new IntRect(0 , 64, 32, 32),
+                SourceTextureRect =  Rect,
                 RenderSize = Vector.Create(TileWidth, TileHeight)
             };
         }

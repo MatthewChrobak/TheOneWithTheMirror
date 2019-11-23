@@ -26,7 +26,7 @@ namespace Game.Scenes.MainMenu
 
         public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e) {
             if (e.Button == JoystickButton.A) {
-                SceneManager.Singleton.LoadScene<Stage1.Stage1>();
+                SceneManager.Singleton.LoadScene<Stage1.Stage1>(true);
             }
             if (e.Button == JoystickButton.Back) {
                 this.HandleCloseButtonPressed();
