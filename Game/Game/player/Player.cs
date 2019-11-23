@@ -4,6 +4,7 @@ using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
 using Game.Models.Chunks;
+using Game.Scenes.Stage1;
 using System;
 
 public class Player : IDrawableObject
@@ -12,7 +13,7 @@ public class Player : IDrawableObject
     public event Action<Player, int, int> OnPlayerMovedToNewChunk;
 
     public Vector Position;
-    private readonly SpriteSheetContext _sprite;
+    public SpriteSheetContext _sprite;
 
     private int framesBeforeSlowingDown = 5;
     private long slowedFrameIntervals = 50;
@@ -25,7 +26,7 @@ public class Player : IDrawableObject
     private int jumpCount = 0;
     private long lastTimeMoved;
 
-    private uint _joystickID;
+    public uint _joystickID;
 
     public Player(uint joystickID) {
         this._joystickID = joystickID;
@@ -36,13 +37,8 @@ public class Player : IDrawableObject
             SourceTextureRect = new IntRect(0, 0, 32, 32)
         };
         */
-
-        this._sprite = new SpriteSheetContext("smushy.png", 1, 8) {
-            RenderPosition = this.Position,
-            RenderSize = Vector.Create(25, 50)
-        };
-
-        EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
+        
+        EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "PlayerInput");
     }
 
     public void SetCurrentChunk(MapChunk chunk) {
@@ -55,6 +51,12 @@ public class Player : IDrawableObject
     }
 
     private ControlEvent HandlePlayerInput() {
+
+        if(!SceneManager.Singleton.IsCurrentScene<Stage1>())
+        {
+            return ControlEvent.NONE;
+        }
+
         var canvas = GameWindow.Singleton.Canvas;
 
         var dx = canvas.GetJoystickAxis(this._joystickID, JoystickAxis.X);
