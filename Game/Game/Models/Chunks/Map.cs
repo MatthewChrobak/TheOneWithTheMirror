@@ -1,16 +1,21 @@
 ﻿using Annex.Graphics;
 using Game.Models.Entities;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Game.Models.Chunks
 {
     public class Map : IDrawableObject
     {
-        private Dictionary<(int, int), MapChunk> _chunks;
+        private Dictionary<(int x, int y), MapChunk> _chunks;
         private HashSet<Entity> _mapEntities;
+        public readonly string Name;
+        public string Folder => $"resources/maps/{Name}/";
+        public string GetChunkFile(int x, int y) => Folder + $"({x})({y}).json";
 
-        public Map() {
+        public Map(string name) {
+            this.Name = name;
             this._chunks = new Dictionary<(int, int), MapChunk>();
             this._mapEntities = new HashSet<Entity>();
         }
@@ -29,9 +34,16 @@ namespace Game.Models.Chunks
             }
         }
 
+        internal void Save() {
+            Directory.CreateDirectory(Folder);
+            foreach (var entry in this._chunks) {
+                Json.SaveChunk(GetChunkFile(entry.Key.x, entry.Key.y), entry.Value);
+            }
+        }
+
         public void LoadChunk(int x, int y) {
             if (!this._chunks.ContainsKey((x, y))) {
-                this._chunks[(x, y)] = new MapChunk(x, y);
+                this._chunks[(x, y)] = Json.LoadChunk(GetChunkFile(x, y)) ?? new MapChunk(x, y);
             }
         }
 

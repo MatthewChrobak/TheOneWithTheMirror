@@ -8,6 +8,7 @@ using Annex.Scenes.Components;
 using Game.Models.Chunks;
 using Game.Models.Entities;
 using Game.Scenes.Stage1.Elements;
+using System.IO;
 
 namespace Game.Scenes.Stage1
 {
@@ -19,8 +20,12 @@ namespace Game.Scenes.Stage1
         public Stage1() {
             players = new Player[4];
 
-            this.map = new Map();
+            this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
+
+            Debug.AddDebugCommand("savemap", (data) => {
+                map.Save();
+            });
         }
 
         public override void Draw(ICanvas canvas)
