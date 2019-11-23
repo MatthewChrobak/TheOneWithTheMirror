@@ -3,11 +3,11 @@ using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
+using System;
 
 public class Player : IDrawableObject
 {
     public Vector Position;
-    //private readonly TextureContext _sprite;
     private readonly SpriteSheetContext _sprite;
 
     private int framesBeforeSlowingDown = 5;
@@ -15,13 +15,16 @@ public class Player : IDrawableObject
 
     private int jumpFrames = 25;
     private int jumpFrameIntervals = 5;
-    private float delayBetweenJumps = 750;
-
+    private const float delayBetweenJumps = 500;
+    private float dx;
+    private float dy;
     private int jumpCount = 0;
     private long lastTimeMoved;
 
-    public Player()
-    {
+    private uint _joystickID;
+
+    public Player(uint joystickID) {
+        this._joystickID = joystickID;
         this.Position = Vector.Create();
         /*
         this._sprite = new TextureContext("Clawdia_FacingUpUp.png")
@@ -30,67 +33,72 @@ public class Player : IDrawableObject
         };
         */
 
-        this._sprite = new SpriteSheetContext("player.png", 4, 4)
-        {
-            RenderPosition = this.Position
+        this._sprite = new SpriteSheetContext("smushy.png", 1, 8) {
+            RenderPosition = this.Position,
+            RenderSize = Vector.Create(25, 50)
         };
 
         EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
     }
 
-    public void Draw(ICanvas canvas)
-    {
+    public void Draw(ICanvas canvas) {
         canvas.Draw(this._sprite);
     }
 
-    private ControlEvent HandlePlayerInput()
-    {
+    private ControlEvent HandlePlayerInput() {
+        var canvas = GameWindow.Singleton.Canvas;
+
+        var dx = canvas.GetJoystickAxis(this._joystickID, JoystickAxis.X);
+        var dy = canvas.GetJoystickAxis(this._joystickID, JoystickAxis.Y);
+        float magX = Math.Abs(dx);
+        float magY = Math.Abs(dy);
+
+        if (magX < 50 && magY < 50) {
+            return ControlEvent.NONE;
+        }
+
         long time = EventManager.CurrentTime;
 
-        if (time > lastTimeMoved + delayBetweenJumps)
-        {
+        if (time > lastTimeMoved + delayBetweenJumps) {
+            this.dx = dx;
+            this.dy = dy;
             this.jumpCount = 0;
             var events = EventManager.Singleton;
-            events.AddEvent(PriorityType.ANIMATION, Jump, jumpFrameIntervals, 0,"Jump");
+            events.AddEvent(PriorityType.ANIMATION, Jump, jumpFrameIntervals, 0, "Jump");
             lastTimeMoved = time;
+
+            events.AddEvent(PriorityType.ANIMATION, UpdateAnimation, (int)delayBetweenJumps / 10);
         }
 
         return ControlEvent.NONE;
     }
 
-    private ControlEvent Jump()
-    {
+    private ControlEvent Jump() {
         jumpCount++;
 
-        if (jumpCount == jumpFrames)
-        {
+        if (jumpCount == jumpFrames) {
             return ControlEvent.REMOVE;
-        }
-        else if (jumpCount >= jumpFrames - framesBeforeSlowingDown)
-        {
+        } else if (jumpCount >= jumpFrames - framesBeforeSlowingDown) {
             //var events = Events.GetEvent("Jump");
             var e = EventManager.Singleton.GetEvent("Jump");
             e.SetInterval(slowedFrameIntervals);
         }
 
         var canvas = GameWindow.Singleton.Canvas;
-        float speed = 1;
-        if (canvas.IsKeyDown(KeyboardKey.Up))
-        {
-            this.Position.Add(0, -speed);
+        float speed = 2;
+        float signX = (this.dx / 100) * speed;
+        float signY = (this.dy / 100) * speed;
+        this.Position.Add(signX * speed, signY * speed);
+        return ControlEvent.NONE;
+    }
+
+    private ControlEvent UpdateAnimation() {
+        this._sprite.StepColumn();
+
+        if (this._sprite.Column == 0) {
+            return ControlEvent.REMOVE;
         }
-        if (canvas.IsKeyDown(KeyboardKey.Down))
-        {
-            this.Position.Y += speed;
-        }
-        if (canvas.IsKeyDown(KeyboardKey.Left))
-        {
-            this.Position.X -= speed;
-        }
-        if (canvas.IsKeyDown(KeyboardKey.Right))
-        {
-            this.Position.X += speed;
-        }
+
         return ControlEvent.NONE;
     }
 }

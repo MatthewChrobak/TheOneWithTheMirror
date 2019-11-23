@@ -1,5 +1,5 @@
 ﻿using Annex;
-using Game.Scenes.Stage1;
+using Game.Scenes.MainMenu;
 
 namespace Game
 {
@@ -7,7 +7,7 @@ namespace Game
     {
         public static void Main(string[] args) {
             var game = new AnnexGame();
-            game.Start<Stage1>();
+            game.Start<MainMenu>();
         }
     }
 }

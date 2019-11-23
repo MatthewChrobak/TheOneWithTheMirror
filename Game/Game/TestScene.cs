@@ -20,8 +20,6 @@ public class TestScene : Scene
     */
     public TestScene()
     {
-        this._player = new Player();
-
         var camera = GameWindow.Singleton.Canvas.GetCamera();
         //camera.Follow(this._player.Position);        
 
