@@ -6,6 +6,8 @@ namespace Game.Models.Chunks
 {
     public class MapChunk : IDrawableObject
     {
+        public int X, Y;
+
         public const int X_Tiles = 10;
         public const int Y_Tiles = 10;
 
@@ -17,6 +19,8 @@ namespace Game.Models.Chunks
         public readonly Tile[] Tiles;
 
         public MapChunk(int x, int y) {
+            this.X = x;
+            this.Y = y;
             this.Tiles = new Tile[X_Tiles * Y_Tiles];
             this.RenderOffset = new ScalingVector(Vector.Create(x, y), ChunkWidth, ChunkHeight);
 

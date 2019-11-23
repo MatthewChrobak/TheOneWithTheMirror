@@ -3,9 +3,14 @@ using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
+using Game.Models.Chunks;
+using System;
 
 public class Player : IDrawableObject
 {
+    public MapChunk currentChunk;
+    public event Action<int, int> OnPlayerMovedToNewChunk;
+
     public Vector Position;
     //private readonly TextureContext _sprite;
     private readonly SpriteSheetContext _sprite;
@@ -22,7 +27,8 @@ public class Player : IDrawableObject
 
     public Player()
     {
-        this.Position = Vector.Create();
+        this.Position = Vector.Create();    
+        
         /*
         this._sprite = new TextureContext("Clawdia_FacingUpUp.png")
         {
@@ -36,6 +42,11 @@ public class Player : IDrawableObject
         };
 
         EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
+    }
+
+    public void SetCurrentChunk(MapChunk chunk)
+    {
+        currentChunk = chunk;
     }
 
     public void Draw(ICanvas canvas)
@@ -91,6 +102,20 @@ public class Player : IDrawableObject
         {
             this.Position.X += speed;
         }
+
+        HasMovedToNewChunk();
+
         return ControlEvent.NONE;
+    }
+
+    public void HasMovedToNewChunk()
+    {
+        int curChunkX = (int)MathF.Floor(Position.X / (MapChunk.ChunkWidth));
+        int curChunkY = (int)MathF.Floor(Position.Y / (MapChunk.ChunkHeight));
+
+        if(curChunkX != currentChunk.X || curChunkY != currentChunk.Y)
+        {
+            OnPlayerMovedToNewChunk?.Invoke(curChunkX, curChunkY);
+        }        
     }
 }
