@@ -6,16 +6,15 @@ using Annex.Scenes;
 using Game.Models.Chunks;
 using System;
 
-namespace Game.Models.Player
+namespace Game.Models.Entities
 {
-    public class Player : IDrawableObject
+    public class Player : Entity
     {
         private (int x, int y) LastChunkID = (int.MinValue, int.MinValue);
         private int CurrentXChunkID => (int)Math.Floor(this.Position.X / MapChunk.ChunkWidth);
         private int CurrentYChunkID => (int)Math.Floor(this.Position.Y / MapChunk.ChunkHeight);
         public event Action<int, int> ChunkLoader;
 
-        public Vector Position;
         private readonly SpriteSheetContext _sprite;
 
         private int framesBeforeSlowingDown = 5;
@@ -33,13 +32,6 @@ namespace Game.Models.Player
 
         public Player(uint joystickID) {
             this._joystickID = joystickID;
-            this.Position = Vector.Create();
-            /*
-            this._sprite = new TextureContext("Clawdia_FacingUpUp.png")
-            {
-                SourceTextureRect = new IntRect(0, 0, 32, 32)
-            };
-            */
 
             this._sprite = new SpriteSheetContext("smushy.png", 1, 8) {
                 RenderPosition = this.Position,
@@ -49,7 +41,7 @@ namespace Game.Models.Player
             EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
         }
 
-        public void Draw(ICanvas canvas) {
+        public override void Draw(ICanvas canvas) {
             canvas.Draw(this._sprite);
         }
 

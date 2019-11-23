@@ -6,9 +6,8 @@ using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
 using Game.Models.Chunks;
-using Game.Models.Player;
+using Game.Models.Entities;
 using Game.Scenes.Stage1.Elements;
-using System.Collections.Generic;
 
 namespace Game.Scenes.Stage1
 {
@@ -27,9 +26,6 @@ namespace Game.Scenes.Stage1
         public override void Draw(ICanvas canvas)
         {
             map.Draw(canvas);
-            for (int i = 0; i < this.players.Length; i++) {
-                this.players[i]?.Draw(canvas);
-            }
             base.Draw(canvas);
         }
 
@@ -65,6 +61,7 @@ namespace Game.Scenes.Stage1
                     var newPlayer = new Player(e.JoystickID);
                     this.players[e.JoystickID] = newPlayer;
                     this.players[e.JoystickID].ChunkLoader += map.LoadChunk; // Remove event when changing scenes
+                    this.map.AddEntity(newPlayer);
 
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
 
