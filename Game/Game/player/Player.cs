@@ -3,10 +3,14 @@ using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
+using Game.Models.Chunks;
 using System;
 
 public class Player : IDrawableObject
 {
+    public MapChunk currentChunk;
+    public event Action<Player, int, int> OnPlayerMovedToNewChunk;
+
     public Vector Position;
     private readonly SpriteSheetContext _sprite;
 
@@ -41,7 +45,12 @@ public class Player : IDrawableObject
         EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
     }
 
-    public void Draw(ICanvas canvas) {
+    public void SetCurrentChunk(MapChunk chunk) {
+        currentChunk = chunk;
+    }
+
+    public void Draw(ICanvas canvas)
+    {
         canvas.Draw(this._sprite);
     }
 
@@ -89,6 +98,7 @@ public class Player : IDrawableObject
         float signX = (this.dx / 100) * speed;
         float signY = (this.dy / 100) * speed;
         this.Position.Add(signX * speed, signY * speed);
+        HasMovedToNewChunk();
         return ControlEvent.NONE;
     }
 
@@ -98,7 +108,17 @@ public class Player : IDrawableObject
         if (this._sprite.Column == 0) {
             return ControlEvent.REMOVE;
         }
-
         return ControlEvent.NONE;
+    }
+
+    public void HasMovedToNewChunk()
+    {
+        int curChunkX = (int)MathF.Floor(Position.X / (MapChunk.ChunkWidth));
+        int curChunkY = (int)MathF.Floor(Position.Y / (MapChunk.ChunkHeight));
+
+        if(curChunkX != currentChunk?.X || curChunkY != currentChunk?.Y)
+        {
+            OnPlayerMovedToNewChunk?.Invoke(this, curChunkX, curChunkY);
+        }        
     }
 }

@@ -1,4 +1,4 @@
-﻿using Annex.Data.Shared;
+using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Events;
@@ -19,13 +19,11 @@ namespace Game.Scenes.Stage1
             players = new Player[4];
 
             this.map = new Map();
-            map.GetChunk(0, 0);
-            map.GetChunk(1, 1);
-
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
         }
 
-        public override void Draw(ICanvas canvas) {
+        public override void Draw(ICanvas canvas)
+        {
             map.Draw(canvas);
             for (int i = 0; i < this.players.Length; i++) {
                 this.players[i]?.Draw(canvas);
@@ -65,8 +63,9 @@ namespace Game.Scenes.Stage1
 
                     _playerLoaded.Add(e.JoystickID);
                     this.players[e.JoystickID] = new Player(e.JoystickID);
+                    this.players[e.JoystickID].OnPlayerMovedToNewChunk += LoadNearChunks; // Remove event when changing scenes
 
-                    Vector v = this.players[e.JoystickID].Position;
+                    var v = this.players[e.JoystickID].Position;
                     float count = 1;
 
                     for (int i = 0; i < this.players.Length; i++) {
@@ -84,6 +83,22 @@ namespace Game.Scenes.Stage1
                     v = new ScalingVector(v, 1 / count, 1 / count);
 
                     GameWindow.Singleton.Canvas.GetCamera().Follow(v);
+                }
+            }
+        }
+
+        public void LoadNearChunks(Player player, int x, int y)
+        {            
+            for (int i = -1; i <= 1; i++)
+            {
+                for(int j = -1; j <= 1; j++)
+                {
+                    if (x + i == x && y + j == y)
+                    {
+                        player.SetCurrentChunk(map.GetChunk(x, y));
+                        continue;
+                    }
+                    map.GetChunk(x + i, y + j);
                 }
             }
         }
