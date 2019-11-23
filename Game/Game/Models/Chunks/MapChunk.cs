@@ -1,5 +1,6 @@
 ﻿using Annex;
 using Annex.Data.Shared;
+using Annex.Events;
 using Annex.Graphics;
 
 namespace Game.Models.Chunks
@@ -7,6 +8,8 @@ namespace Game.Models.Chunks
     public class MapChunk : IDrawableObject
     {
         public int X, Y;
+
+        public long lastTimeUsed = EventManager.CurrentTime;
 
         public const int X_Tiles = 10;
         public const int Y_Tiles = 10;
