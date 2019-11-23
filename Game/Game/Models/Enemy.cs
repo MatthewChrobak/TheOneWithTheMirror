@@ -11,7 +11,7 @@ namespace Game.Models
         public readonly Vector Position;
         public readonly int enemyMovementSpeed;
 
-        public const int enemyMovementSpeedLowerBound = 0;
+        public const int enemyMovementSpeedLowerBound = 1;
         public const int enemyMovementSpeedHigherBound = 10;
         public const int positionXLowerBound = 0;
         public const int positionXHigherBound = 1000;
@@ -35,7 +35,7 @@ namespace Game.Models
             Position.X = positionX;
             Position.Y = positionY;
 
-            this._sprite = new SpriteSheetContext("player.png", 4, 4)
+            this._sprite = new SpriteSheetContext("Pokemon.png", 25, 20)
             {
                 RenderPosition = Position
             };

@@ -9,4 +9,9 @@
     <ProjectReference Include="..\Annex\Annex.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="resources\audio\" />
+    <Folder Include="Sounds\" />
+  </ItemGroup>
+
 </Project>
