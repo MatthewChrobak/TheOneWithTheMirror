@@ -1,3 +1,4 @@
+using Annex;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
@@ -5,14 +6,14 @@ using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
 using Game.Models.Chunks;
+using Game.Models.Entities;
 using Game.Scenes.Stage1.Elements;
-using System.Collections.Generic;
 
 namespace Game.Scenes.Stage1
 {
     public class Stage1 : Scene
     {
-        public Map map;
+        public readonly Map map;
         public Player[] players;
 
         public Stage1() {
@@ -25,18 +26,14 @@ namespace Game.Scenes.Stage1
         public override void Draw(ICanvas canvas)
         {
             map.Draw(canvas);
-            for (int i = 0; i < this.players.Length; i++) {
-                this.players[i]?.Draw(canvas);
-            }
             base.Draw(canvas);
         }
 
-        private HashSet<uint> _playerLoaded = new HashSet<uint>();
         private ControlEvent CheckForNewInput() {
             var canvas = GameWindow.Singleton.Canvas;
 
             for (uint i = 0; i < 4; i++) {
-                if (_playerLoaded.Contains(i)) {
+                if (players[i] != null) {
                     continue;
                 }
 
@@ -58,16 +55,19 @@ namespace Game.Scenes.Stage1
             }
 
             if (e.Button == JoystickButton.A) {
-                if (!_playerLoaded.Contains(e.JoystickID)) {
+                if (players[e.JoystickID] == null) {
                     this.RemoveElementById(ConnectNotification.ID);
 
-                    _playerLoaded.Add(e.JoystickID);
-                    this.players[e.JoystickID] = new Player(e.JoystickID);
-                    this.players[e.JoystickID].OnPlayerMovedToNewChunk += LoadNearChunks; // Remove event when changing scenes
+                    var newPlayer = new Player(e.JoystickID);
+                    this.players[e.JoystickID] = newPlayer;
+                    this.players[e.JoystickID].ChunkLoader += map.LoadChunk; // Remove event when changing scenes
+                    this.map.AddEntity(newPlayer);
 
-                    var v = this.players[e.JoystickID].Position;
+                    Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
+
+                    // TODO: Move this to its own function.
+                    var v = newPlayer.Position;
                     float count = 1;
-
                     for (int i = 0; i < this.players.Length; i++) {
                         if (i == e.JoystickID) {
                             continue;
@@ -79,28 +79,23 @@ namespace Game.Scenes.Stage1
                         v = new OffsetVector(v, this.players[i].Position);
                         count++;
                     }
-
                     v = new ScalingVector(v, 1 / count, 1 / count);
-
                     GameWindow.Singleton.Canvas.GetCamera().Follow(v);
                 }
             }
         }
 
-        public void LoadNearChunks(Player player, int x, int y)
-        {            
-            for (int i = -1; i <= 1; i++)
-            {
-                for(int j = -1; j <= 1; j++)
-                {
-                    if (x + i == x && y + j == y)
-                    {
-                        player.SetCurrentChunk(map.GetChunk(x, y));
-                        continue;
-                    }
-                    map.GetChunk(x + i, y + j);
-                }
+        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
+            if (e.Key == KeyboardKey.Insert) {
+                Debug.ToggleDebugOverlay();
             }
+
+            base.HandleKeyboardKeyPressed(e);
+
+            if (e.Handled) {
+                return;
+            }
+
         }
     }
 }
