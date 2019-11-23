@@ -5,6 +5,7 @@ using Annex.Graphics.Contexts;
 using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
+using Game.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;

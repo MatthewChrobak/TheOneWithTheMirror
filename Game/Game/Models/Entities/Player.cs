@@ -4,6 +4,7 @@ using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
 using Game.Models.Chunks;
+using Game.Scenes.Stage1;
 using System;
 
 namespace Game.Models.Entities
@@ -15,7 +16,7 @@ namespace Game.Models.Entities
         private int CurrentYChunkID => (int)Math.Floor(this.Position.Y / MapChunk.ChunkHeight);
         public event Action<int, int> ChunkLoader;
 
-        private readonly SpriteSheetContext _sprite;
+        public SpriteSheetContext _sprite;
 
         private int framesBeforeSlowingDown = 5;
         private long slowedFrameIntervals = 50;
@@ -28,7 +29,7 @@ namespace Game.Models.Entities
         private int jumpCount = 0;
         private long lastTimeMoved;
 
-        private uint _joystickID;
+        public readonly uint _joystickID;
 
         public Player(uint joystickID) {
             this._joystickID = joystickID;
@@ -46,6 +47,12 @@ namespace Game.Models.Entities
         }
 
         private ControlEvent HandlePlayerInput() {
+            if (!SceneManager.Singleton.IsCurrentScene<Stage1>())
+            {
+                return ControlEvent.NONE;
+            }
+
+
             var canvas = GameWindow.Singleton.Canvas;
 
             var dx = canvas.GetJoystickAxis(this._joystickID, JoystickAxis.X);
