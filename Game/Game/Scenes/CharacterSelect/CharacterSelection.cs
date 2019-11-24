@@ -43,6 +43,11 @@ namespace Game.Scenes.CharacterSelect
                 //RenderPosition = Vector.Create(GameWindow.RESOLUTION_WIDTH / 2, GameWindow.RESOLUTION_HEIGHT / 2),
                 RenderSize = Vector.Create(32, 32)
             };
+
+            characters[3] = new SpriteSheetContext("Clawdia_DirectionSheet.png", 3, 3)
+            {
+                RenderSize = Vector.Create(32, 32)
+        };
             
             this.Events.AddEvent("ChooseCharacter", PriorityType.INPUT, ChooseCharacter, 500);
         }

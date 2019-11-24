@@ -22,7 +22,7 @@ namespace Game.Scenes.Stage1
         // MAP EDITING TOOLS
         public string MapBrush_Texture;
         public int MapBrush_Top;
-        public int MapBrush_Left;
+        public int MapBrush_Left;        
 
         public Stage1() {
             players = new Player[4];
@@ -89,29 +89,33 @@ namespace Game.Scenes.Stage1
                     characterSelection.EditingPlayer = this.players[e.JoystickID];  
                     
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
-
-
-                    // TODO: Move this to its own function.
-                    var v = newPlayer.Position;
-                    float count = 1;
-                    for (int i = 0; i < this.players.Length; i++) {
-                        if (i == e.JoystickID) {
-                            continue;
-                        }
-
-                        if (this.players[i] == null)
-                        {
-                            continue;
-                        }
-                        v = new OffsetVector(v, this.players[i].Position);
-                        count++;
-                    }
-                    v = new ScalingVector(v, 1 / count, 1 / count);
-                    GameWindow.Singleton.Canvas.GetCamera().Follow(v);
-                    
+                    CameraFocus(newPlayer);
                 }
             }
         }
+
+        public void CameraFocus(Player player)
+        {
+            var v = player.Position;
+            float count = 1;
+            for (int i = 0; i < this.players.Length; i++)
+            {
+                if (i == player._joystickID)
+                {
+                    continue;
+                }
+
+                if (this.players[i] == null)
+                {
+                    continue;
+                }
+                v = new OffsetVector(v, this.players[i].Position);
+                count++;
+            }
+            v = new ScalingVector(v, 1 / count, 1 / count);
+            GameWindow.Singleton.Canvas.GetCamera().Follow(v);            
+        }
+
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
             if (e.Key == KeyboardKey.Insert) {
                 Debug.ToggleDebugOverlay();
