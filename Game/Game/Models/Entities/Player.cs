@@ -31,6 +31,8 @@ namespace Game.Models.Entities
         private int jumpCount = 0;
         private long lastTimeMoved;
 
+        private double angle;
+
         public readonly uint _joystickID;
 
         public Player(uint joystickID) : base(5, 5, 5, 5) {
@@ -43,6 +45,7 @@ namespace Game.Models.Entities
 
             EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
             Debug.AddDebugInformation(() => $"Player {_joystickID} dx: {dx} dy: {dy}");
+            Debug.AddDebugInformation(() => $"Angle: {angle}");
         }
 
         public override void Draw(ICanvas canvas) {
@@ -114,13 +117,54 @@ namespace Game.Models.Entities
             if (this._sprite.Column == 0) {
                 return ControlEvent.REMOVE;
             }
-            return ControlEvent.NONE;
-           
+            return ControlEvent.NONE;           
         }
 
         public void ChangeDirection()
         {
-            var angle = Math.Atan2(dy, dx) * (180 / Math.PI);
+            angle = (Math.Atan2(dy, dx) * (180 / Math.PI) + 360) % 360;
+            
+            //right
+            if(angle >= 337.5 || angle < 22.5)
+            {
+
+            }
+            //bottom right
+            else if (angle >= 22.5 || angle < 67.5)
+            {
+
+            }
+            //down
+            else if(angle >= 67.5 || angle < 112.5)
+            {
+
+            }
+            //bottom left
+            else if(angle >= 112.5 || angle < 157.5)
+            {
+
+            }
+            //left
+            else if(angle >= 157.5 || angle < 202.5)
+            {
+
+            }
+            //top left
+            else if(angle >= 202.5 || angle < 247.5)
+            {
+
+            }
+            //up
+            else if(angle >= 247.5 || angle < 292.5)
+            {
+
+            }
+            //top right
+            else if(angle >= 292.5 || angle < 337.5)
+            {
+
+            }
+
 
             //left
             if(dx < - 50)
@@ -128,7 +172,7 @@ namespace Game.Models.Entities
                 if (this._sprite.Row % 2 == 1)
                 {
                     this._sprite.StepRow();
-                }
+                }                
             }
             //right
             else if(dx > 50)
@@ -137,17 +181,7 @@ namespace Game.Models.Entities
                 {
                     this._sprite.StepRow();
                 }                
-            }
-            //down
-            else if(dy > 50 && dx < 50 && dx > 0)
-            {
-
-            }
-            //up
-            else if(dy < -50 && dx < 50 && dx > 0)
-            {
-
-            }
+            }            
         }
     }
 }

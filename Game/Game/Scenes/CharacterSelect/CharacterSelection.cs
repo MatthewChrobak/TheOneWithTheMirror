@@ -27,20 +27,17 @@ namespace Game.Scenes.CharacterSelect
             for (int i = 0; i < characters.Length; i++)
             {
                 characters[i] = new SpriteSheetContext("Clawdia_Direction_Anim-LeftRightt.png", 2, 8)
-                {
-                    //RenderPosition = Vector.Create(GameWindow.RESOLUTION_WIDTH/2, GameWindow.RESOLUTION_HEIGHT/2),
+                {                    
                     RenderSize = Vector.Create(32, 32)
                 };
             }
             characters[1] = new SpriteSheetContext("player.png", 4, 4)
-            {
-                //RenderPosition = Vector.Create(GameWindow.RESOLUTION_WIDTH / 2, GameWindow.RESOLUTION_HEIGHT / 2),
+            {                
                 RenderSize = Vector.Create(96, 96)
             };
 
             characters[2] = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
-            {
-                //RenderPosition = Vector.Create(GameWindow.RESOLUTION_WIDTH / 2, GameWindow.RESOLUTION_HEIGHT / 2),
+            {                
                 RenderSize = Vector.Create(32, 32)
             };
 
@@ -89,7 +86,7 @@ namespace Game.Scenes.CharacterSelect
                 selectedCharacter = characters[index];
                 EditingPlayer._sprite = new SpriteSheetContext(selectedCharacter.SourceTextureName, (uint)selectedCharacter.NumRows, (uint)selectedCharacter.NumColumns)
                 {
-                    RenderPosition = EditingPlayer.Position,
+                    RenderPosition = new OffsetVector(EditingPlayer.Position, Vector.Create(-16, -16)),
                     RenderSize = Vector.Create(32, 32)
                 };
                 SceneManager.Singleton.LoadScene<Stage1.Stage1>();

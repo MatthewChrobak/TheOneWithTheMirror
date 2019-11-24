@@ -41,7 +41,13 @@ namespace Game.Scenes.Stage1
 
             //audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
 
-            map.AddEntity(new Enemy());
+            var enemy = new Enemy();
+            enemy.Position.Set(10, 10);
+            map.AddEntity(enemy);
+
+            var item = new Item();
+            item.Position.Set(50, 50);
+            map.AddEntity(item);
 
             this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
@@ -187,12 +193,13 @@ namespace Game.Scenes.Stage1
                         {
                             enemy.Position.Y -= enemy.enemyMovementSpeed;
                         }
-
+                        var collision = this.map.GetMaximumColllisions(enemy);
+                        enemy.Position.Add(collision.x, collision.y);
 
 
                         if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
                         {
-                            audio.PlayAudio("Sharp_Punch.flac");
+                            //audio.PlayAudio("Sharp_Punch.flac");
                         }
                     }
                 }
