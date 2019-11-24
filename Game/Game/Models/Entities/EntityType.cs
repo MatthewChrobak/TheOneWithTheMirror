@@ -12,6 +12,7 @@ namespace Game.Models.Entities
         PoisonBow,
         Shield,
         RegenPotion,
+        SpeedRing,
         None
     }
 }
