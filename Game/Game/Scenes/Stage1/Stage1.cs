@@ -50,6 +50,13 @@ namespace Game.Scenes.Stage1
 
             this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
+            this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, () => {
+                foreach (var entity in map.GetEntities(e => e.EntityType == EntityType.Enemy)) {
+                    var enemy = entity as Enemy;
+                    enemy.Animate();
+                }
+                return ControlEvent.NONE;
+            }, 1000);
             this.Events.AddEvent("update-fly-positions", PriorityType.LOGIC, UpdateFlyPositions, 20);
             this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
             this.Events.AddEvent("rotatePoisonArrow", PriorityType.LOGIC, UpdatePoisonBowAnimation, 100);
@@ -107,12 +114,10 @@ namespace Game.Scenes.Stage1
                 map.AddEntity(new Sword());
             });
         }
-        private ControlEvent UpdateSpeedRingAnimation()
-        {
+        private ControlEvent UpdateSpeedRingAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.SpeedRing);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is SpeedRing item)
                     item._sprite.StepColumn();
             }
@@ -120,12 +125,10 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent UpdateRegenPotionAnimation()
-        {
+        private ControlEvent UpdateRegenPotionAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.RegenPotion);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is RegenPotion item)
                     item._sprite.StepColumn();
             }
@@ -133,12 +136,10 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent UpdateShieldAnimation()
-        {
+        private ControlEvent UpdateShieldAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.Shield);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is Shield item)
                     item._sprite.StepColumn();
             }
@@ -146,10 +147,8 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent AddEnemy()
-        {
-            if (enemyCount < maximumEnemy)
-            {
+        private ControlEvent AddEnemy() {
+            if (enemyCount < maximumEnemy) {
                 map.AddEntity(new Enemy());
                 enemyCount++;
             }
@@ -166,12 +165,10 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent UpdatePoisonBowAnimation()
-        {
+        private ControlEvent UpdatePoisonBowAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.PoisonBow);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is PoisonBow item)
                     item._sprite.StepColumn();
             }
@@ -194,59 +191,70 @@ namespace Game.Scenes.Stage1
             var enemyList = map.GetEntities(entity => entity.EntityType == EntityType.Enemy).ToList();
             foreach (var entity in enemyList) {
                 if (entity is Enemy enemy) {
-                    var index = 0;
+                    var target = players.FirstOrDefault();
+                    var distance = double.MaxValue;
 
-                    var playerList = map.GetEntities(entity => entity.EntityType == EntityType.Player);
+                    if (target == null) {
+                        continue;
+                    }
 
-                    for (var i = 0; i < (players.Length - 2); i++) {
-                        if (players[i] != null) {
-                            //Get the current player's X-Y position
-                            var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
-                            var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
+                    foreach (var player in players) {
+                        if (player == null) {
+                            continue;
+                        }
+                        var xDif = Math.Abs(enemy.Position.X - player.Position.X);
+                        var yDif = Math.Abs(enemy.Position.Y - player.Position.Y);
 
-                            //Get the next player's X-Y position
-                            var nextPlayerXDifference = currentPlayerXDifference;
-                            var nextPlayerYDifference = currentPlayerYDifference;
+                        double curDistance = Math.Sqrt(xDif * xDif + yDif * yDif);
 
-                            if (players[i + 1] != null) {
-                                nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i + 1].Position.X);
-                                nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
-                            }
-
-
-                            //Find the shortest distance between an enemy and the players
-                            if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) <= Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference))) {
-                                index = i;
-                            } else {
-                                index = i + 1;
-                            }
-
-
-                            if (players[index].Position.X > enemy.Position.X) {
-                                enemy.Position.X += enemy.enemyMovementSpeed;
-                            }
-
-                            if (players[index].Position.X < enemy.Position.X) {
-                                enemy.Position.X -= enemy.enemyMovementSpeed;
-                            }
-
-                            if (players[index].Position.Y > enemy.Position.Y) {
-                                enemy.Position.Y += enemy.enemyMovementSpeed;
-                            }
-
-                            if (players[index].Position.Y < enemy.Position.Y) {
-                                enemy.Position.Y -= enemy.enemyMovementSpeed;
-                            }
-
-                            var correction = this.map.GetMaximumColllisions(enemy);
-                            enemy.Position.Add(correction.x, correction.y);
-
-                            //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
-                            //{
-                            //    audio.PlayAudio("Sharp_Punch.flac");
-                            //}
+                        if (curDistance <= distance) {
+                            target = player;
+                            distance = curDistance;
                         }
                     }
+
+                    float dx = -1;
+                    float dy = -1;
+
+                    float xDifference = target.Position.X - enemy.Position.X;
+                    float yDifference = target.Position.Y - enemy.Position.Y;
+                    if (Math.Abs(xDifference) < enemy.enemyMovementSpeed) {
+                        dx = 0;
+                    }
+                    if (Math.Abs(yDifference) < enemy.enemyMovementSpeed) {
+                        dy = 0;
+                    }
+
+                    if (dx == -1 && dy == -1) {
+                        if (target.Position.X > enemy.Position.X) {
+                            dx += enemy.enemyMovementSpeed;
+                        }
+
+                        if (target.Position.X < enemy.Position.X) {
+                            dx -= enemy.enemyMovementSpeed;
+                        }
+
+                        if (target.Position.Y > enemy.Position.Y) {
+                            dy += enemy.enemyMovementSpeed;
+                        }
+
+                        if (target.Position.Y < enemy.Position.Y) {
+                            dy -= enemy.enemyMovementSpeed;
+                        }
+                    }
+
+                    enemy.Position.Add(dx, dy);
+
+                    var correction = this.map.GetMaximumColllisions(enemy);
+                    enemy.Position.Add(correction.x, correction.y);
+                    enemy.dx = dx;
+                    enemy.dy = dy;
+
+                    //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                    //{
+                    //    audio.PlayAudio("Sharp_Punch.flac");
+                    //}
+
                 }
             }
 
