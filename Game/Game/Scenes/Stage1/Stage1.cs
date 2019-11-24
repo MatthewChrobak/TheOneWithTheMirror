@@ -1,4 +1,5 @@
 using Annex;
+using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
@@ -27,6 +28,7 @@ namespace Game.Scenes.Stage1
         public string MapBrush_Mode = "single";
         public int enemyCount = 0;
         public const int  maximumEnemy = 100;
+        public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
 
         public Stage1() : base("stage1") {
             this.Size.Set(500, 500);
@@ -37,7 +39,10 @@ namespace Game.Scenes.Stage1
             map.AddEntity(new Enemy());
             map.AddEntity(new Sword());
 
-            //this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+
+            audio.PlayBufferedAudio("AwesomeMusic.flac", "AwesomeMusic", true, 60);
+
+            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
             this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
 

@@ -20,10 +20,10 @@ namespace Game.Models
 
         public const int enemyMovementSpeedLowerBound = 1;
         public const int enemyMovementSpeedHigherBound = 4;
-        public const int positionXLowerBound = -5000;
-        public const int positionXHigherBound = 5000;
-        public const int positionYLowerBound = -5000;
-        public const int positionYHigherBound = 5000;
+        public const int positionXLowerBound = 0;
+        public const int positionXHigherBound = 100;
+        public const int positionYLowerBound = 0;
+        public const int positionYHigherBound = 100;
 
 
 
