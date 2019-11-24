@@ -7,10 +7,12 @@ using Annex.Scenes;
 using Game.Models.Chunks;
 using Game.Scenes.Stage1;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Game.Models.Entities
 {
-    public class Player : HitboxEntity
+    public class Player : HitboxEntity, ICombatSystem
     {
         private (int x, int y) LastChunkID = (int.MinValue, int.MinValue);
         public int CurrentXChunkID => (int)Math.Floor(this.Position.X / MapChunk.ChunkWidth);
@@ -34,7 +36,7 @@ namespace Game.Models.Entities
 
         public Player(uint joystickID) : base(5, 5, 5, 5) {
             this._joystickID = joystickID;
-
+            this.health = 100;
             this._sprite = new SpriteSheetContext("smushy.png", 1, 8) {
                 RenderPosition = this.Position,
                 RenderSize = Vector.Create(25, 50)
@@ -113,6 +115,20 @@ namespace Game.Models.Entities
                 return ControlEvent.REMOVE;
             }
             return ControlEvent.NONE;
+        }
+
+        public void Attack(float x, float y, IEnumerable<Entity> entity)
+        {
+            var radius = 50;
+            var enemyWithinPlayerRange = entity.Where(a => radius >= Math.Pow(a.Position.X, 2) + Math.Pow(a.Position.Y, 2)).ToList();
+        }
+
+        public override void OnCollision(HitboxEntity entity)
+        {
+            if (entity.EntityType == EntityType.Enemy) 
+            {
+                entity.health = 0;
+            }
         }
     }
 }

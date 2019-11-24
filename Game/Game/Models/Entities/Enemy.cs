@@ -6,21 +6,22 @@ using System;
 
 namespace Game.Models
 {
-    public class Enemy : Entity
+    public class Enemy : HitboxEntity
     {
         private readonly SpriteSheetContext _sprite;
         public readonly int enemyMovementSpeed;
 
         public const int enemyMovementSpeedLowerBound = 1;
         public const int enemyMovementSpeedHigherBound = 5;
-        public const int positionXLowerBound = -5000;
-        public const int positionXHigherBound = -5000;
-        public const int positionYLowerBound = -5000;
-        public const int positionYHigherBound = -5000;
+        public const int positionXLowerBound = 0;
+        public const int positionXHigherBound = 500;
+        public const int positionYLowerBound = 0;
+        public const int positionYHigherBound = 500;
 
-        public Enemy()
+        public Enemy() : base(5, 5, 5, 5)
         {
             this.EntityType = EntityType.Enemy;
+            this.health = 100;
             Random random = new Random();
             //Generates a random position for the enemy
             var positionX = random.Next(positionXLowerBound, positionXHigherBound);
@@ -43,6 +44,7 @@ namespace Game.Models
         public override void Draw(ICanvas canvas)
         {
             canvas.Draw(this._sprite);
+            base.Draw(canvas);
         }
     }
 }

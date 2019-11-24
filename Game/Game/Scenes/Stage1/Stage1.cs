@@ -183,6 +183,8 @@ namespace Game.Scenes.Stage1
                             enemy.Position.Y -= enemy.enemyMovementSpeed;
                         }
 
+                        var correction = this.map.GetMaximumColllisions(enemy);
+                        enemy.Position.Add(correction.x, correction.y);
 
 
                         if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
@@ -242,6 +244,11 @@ namespace Game.Scenes.Stage1
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
                     CameraFocus(newPlayer);
                 }
+            }
+            //attack button
+            if (e.Button == JoystickButton.B)
+            {
+                this.players[e.JoystickID].Attack(this.players[e.JoystickID].Position.X, this.players[e.JoystickID].Position.Y, this.map.GetEntities(enemy => enemy.EntityType == EntityType.Enemy));
             }
         }
 
