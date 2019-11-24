@@ -51,6 +51,13 @@ namespace Game.Models.Entities.Hitboxes
                 var map = scene.map;
                 map.RemoveEntity(entity);
             }
+
+            if (entity is Flies fly) {
+                var scene = SceneWithMap.CurrentScene;
+                scene.map.RemoveEntity(fly);
+
+                this.Player.Health.Current.Value += 10;
+            }
         }
     }
 }

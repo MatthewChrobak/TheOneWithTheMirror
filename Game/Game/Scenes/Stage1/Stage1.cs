@@ -24,10 +24,13 @@ namespace Game.Scenes.Stage1
         private uint debugPlayerID = 0;
         public string MapBrush_Texture;
         public int MapBrush_Top;
-        public int MapBrush_Left;        
+        public int MapBrush_Left;
         public string MapBrush_Mode = "single";
         public int enemyCount = 0;
         public const int  maximumEnemy = 100;
+
+        //Spawn rate in milliseconds
+        public const int enemySpawnRate = 5000;
         public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
 
         public Stage1() : base("stage1") {
@@ -44,17 +47,26 @@ namespace Game.Scenes.Stage1
             map.AddEntity(new PoisonBow());
             map.AddEntity(new Shield());
             map.AddEntity(new RegenPotion());
-
-
+            map.AddEntity(new SpeedRing());
 
             audio.PlayBufferedAudio("AwesomeMusic.flac", "AwesomeMusic", true, 60);
 
-            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, enemySpawnRate);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
+            this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, () => {
+                foreach (var entity in map.GetEntities(e => e.EntityType == EntityType.Enemy)) {
+                    var enemy = entity as Enemy;
+                    enemy.Animate();
+                }
+                return ControlEvent.NONE;
+            }, 1000);
+            this.Events.AddEvent("update-fly-positions", PriorityType.LOGIC, UpdateFlyPositions, 20);
             this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
             this.Events.AddEvent("rotatePoisonArrow", PriorityType.LOGIC, UpdatePoisonBowAnimation, 100);
             this.Events.AddEvent("rotateShield", PriorityType.LOGIC, UpdateShieldAnimation, 100);
             this.Events.AddEvent("rotateRegenPotion", PriorityType.LOGIC, UpdateRegenPotionAnimation, 100);
+            this.Events.AddEvent("rotateSpeedRing", PriorityType.LOGIC, UpdateSpeedRingAnimation, 100);
+
 
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
@@ -101,18 +113,25 @@ namespace Game.Scenes.Stage1
                 });
             });
 
-            Debug.AddDebugCommand("additem", (data) =>
-            {
+            Debug.AddDebugCommand("additem", (data) => {
                 map.AddEntity(new Sword());
             });
         }
+        private ControlEvent UpdateSpeedRingAnimation() {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.SpeedRing);
 
-        private ControlEvent UpdateRegenPotionAnimation()
-        {
+            foreach (var entity in entities) {
+                if (entity is SpeedRing item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent UpdateRegenPotionAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.RegenPotion);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is RegenPotion item)
                     item._sprite.StepColumn();
             }
@@ -120,12 +139,10 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent UpdateShieldAnimation()
-        {
+        private ControlEvent UpdateShieldAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.Shield);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is Shield item)
                     item._sprite.StepColumn();
             }
@@ -133,21 +150,17 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent AddEnemy()
-        {
-            if (enemyCount < maximumEnemy)
-            {
+        private ControlEvent AddEnemy() {
+            if (enemyCount < maximumEnemy) {
                 map.AddEntity(new Enemy());
                 enemyCount++;
             }
             return ControlEvent.NONE;
         }
-        private ControlEvent UpdateSwordAnimation()
-        {
+        private ControlEvent UpdateSwordAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.Sword);
 
-            foreach(var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is Sword item)
                     item._sprite.StepColumn();
             }
@@ -155,12 +168,10 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent UpdatePoisonBowAnimation()
-        {
+        private ControlEvent UpdatePoisonBowAnimation() {
             var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.PoisonBow);
 
-            foreach (var entity in entities)
-            {
+            foreach (var entity in entities) {
                 if (entity is PoisonBow item)
                     item._sprite.StepColumn();
             }
@@ -168,76 +179,85 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        private ControlEvent UpdateEnemyPositions()
-        {
+        private ControlEvent UpdateFlyPositions() {
+            var flies = map.GetEntities(entity => entity.EntityType == EntityType.Fly);
+            foreach (var f in flies) {
+                var fly = f as Flies;
+                fly.Move();
+                var correction = this.map.GetMapBorderCollisions(fly);
+                fly.Position.Add(correction.x, correction.y);
+            }
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent UpdateEnemyPositions() {
             var enemyList = map.GetEntities(entity => entity.EntityType == EntityType.Enemy).ToList();
-            foreach (var entity in enemyList)
-            {
-                var enemy = entity as Enemy;
+            foreach (var entity in enemyList) {
+                if (entity is Enemy enemy) {
+                    var target = players.FirstOrDefault();
+                    var distance = double.MaxValue;
 
-                var index = 0;
-
-                var playerList = map.GetEntities(entity => entity.EntityType == EntityType.Player);
-
-
-                for (var i = 0; i < (players.Length - 2); i++)
-                {
-                    if (players[i] != null)
-                    {
-                        //Get the current player's X-Y position
-                        var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
-                        var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
-
-                        //Get the next player's X-Y position
-                        var nextPlayerXDifference = currentPlayerXDifference;
-                        var nextPlayerYDifference = currentPlayerYDifference;
-
-                        if (players[i + 1] != null)
-                        {
-                            nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i + 1].Position.X);
-                            nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
-                        }
-
-
-                        //Find the shortest distance between an enemy and the players
-                        if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) <= Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
-                        {
-                            index = i;
-                        }
-                        else
-                        {
-                            index = i + 1;
-                        }
-
-
-                        if (players[index].Position.X > enemy.Position.X)
-                        {
-                            enemy.Position.X += enemy.enemyMovementSpeed;
-                        }
-
-                        if (players[index].Position.X < enemy.Position.X)
-                        {
-                            enemy.Position.X -= enemy.enemyMovementSpeed;
-                        }
-
-                        if (players[index].Position.Y > enemy.Position.Y)
-                        {
-                            enemy.Position.Y += enemy.enemyMovementSpeed;
-                        }
-
-                        if (players[index].Position.Y < enemy.Position.Y)
-                        {
-                            enemy.Position.Y -= enemy.enemyMovementSpeed;
-                        }
-
-                        var correction = this.map.GetMaximumColllisions(enemy);
-                        enemy.Position.Add(correction.x, correction.y);
-
-                        //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
-                        //{
-                        //    audio.PlayAudio("Sharp_Punch.flac");
-                        //}
+                    if (target == null) {
+                        continue;
                     }
+
+                    foreach (var player in players) {
+                        if (player == null) {
+                            continue;
+                        }
+                        var xDif = Math.Abs(enemy.Position.X - player.Position.X);
+                        var yDif = Math.Abs(enemy.Position.Y - player.Position.Y);
+
+                        double curDistance = Math.Sqrt(xDif * xDif + yDif * yDif);
+
+                        if (curDistance <= distance) {
+                            target = player;
+                            distance = curDistance;
+                        }
+                    }
+
+                    float dx = -1;
+                    float dy = -1;
+
+                    float xDifference = target.Position.X - enemy.Position.X;
+                    float yDifference = target.Position.Y - enemy.Position.Y;
+                    if (Math.Abs(xDifference) < enemy.enemyMovementSpeed) {
+                        dx = 0;
+                    }
+                    if (Math.Abs(yDifference) < enemy.enemyMovementSpeed) {
+                        dy = 0;
+                    }
+
+                    if (dx == -1 && dy == -1) {
+                        if (target.Position.X > enemy.Position.X) {
+                            dx += enemy.enemyMovementSpeed;
+                        }
+
+                        if (target.Position.X < enemy.Position.X) {
+                            dx -= enemy.enemyMovementSpeed;
+                        }
+
+                        if (target.Position.Y > enemy.Position.Y) {
+                            dy += enemy.enemyMovementSpeed;
+                        }
+
+                        if (target.Position.Y < enemy.Position.Y) {
+                            dy -= enemy.enemyMovementSpeed;
+                        }
+                    }
+
+                    enemy.Position.Add(dx, dy);
+
+                    var correction = this.map.GetMaximumColllisions(enemy);
+                    enemy.Position.Add(correction.x, correction.y);
+                    enemy.dx = dx;
+                    enemy.dy = dy;
+
+                    //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                    //{
+                    //    audio.PlayAudio("Sharp_Punch.flac");
+                    //}
+
                 }
             }
 
@@ -253,11 +273,9 @@ namespace Game.Scenes.Stage1
                     continue;
                 }
 
-                if (canvas.IsJoystickConnected(i))
-                {
+                if (canvas.IsJoystickConnected(i)) {
                     var notification = this.GetElementById(ConnectNotification.ID);
-                    if (notification == null)
-                    {
+                    if (notification == null) {
                         this.AddChild(new ConnectNotification());
                     }
                 }
@@ -266,10 +284,8 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e)
-        {
-            if (e.Button == JoystickButton.Back)
-            {
+        public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e) {
+            if (e.Button == JoystickButton.Back) {
                 SceneManager.Singleton.LoadScene<MainMenu.MainMenu>();
                 return;
             }
@@ -289,37 +305,32 @@ namespace Game.Scenes.Stage1
                     characterSelection.EditingPlayer = this.players[e.JoystickID];
 
                     this.AddChild(new PlayerOverlay(newPlayer));
-                    
+
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
                     CameraFocus(newPlayer);
                 }
             }
             //attack button
-            if (e.Button == JoystickButton.B)
-            {
+            if (e.Button == JoystickButton.B) {
             }
         }
 
-        public void CameraFocus(Player player)
-        {
+        public void CameraFocus(Player player) {
             var v = player.Position;
             float count = 1;
-            for (int i = 0; i < this.players.Length; i++)
-            {
-                if (i == player._joystickID)
-                {
+            for (int i = 0; i < this.players.Length; i++) {
+                if (i == player._joystickID) {
                     continue;
                 }
 
-                if (this.players[i] == null)
-                {
+                if (this.players[i] == null) {
                     continue;
                 }
                 v = new OffsetVector(v, this.players[i].Position);
                 count++;
             }
             v = new ScalingVector(v, 1 / count, 1 / count);
-            GameWindow.Singleton.Canvas.GetCamera().Follow(v);            
+            GameWindow.Singleton.Canvas.GetCamera().Follow(v);
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
@@ -335,10 +346,8 @@ namespace Game.Scenes.Stage1
                 });
             }
 
-            if(e.Key == KeyboardKey.Tab)
-            {
-                this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent()
-                {
+            if (e.Key == KeyboardKey.Tab) {
+                this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
                     Button = JoystickButton.A
                 });
             }
