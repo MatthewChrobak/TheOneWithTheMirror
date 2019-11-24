@@ -189,7 +189,8 @@ namespace Game.Scenes.Stage1
                             enemy.Position.Y -= enemy.enemyMovementSpeed;
                         }
 
-
+                        var correction = this.map.GetMaximumColllisions(enemy);
+                        enemy.Position.Add(correction.x, correction.y);
 
                         //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
                         //{

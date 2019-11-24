@@ -12,11 +12,14 @@ namespace Game.Models
         public readonly int enemyMovementSpeed;
 
         public const int enemyMovementSpeedLowerBound = 1;
-        public const int enemyMovementSpeedHigherBound = 5;
+        public const int enemyMovementSpeedHigherBound = 4;
         public const int positionXLowerBound = -5000;
-        public const int positionXHigherBound = -5000;
+        public const int positionXHigherBound = 5000;
         public const int positionYLowerBound = -5000;
-        public const int positionYHigherBound = -5000;
+        public const int positionYHigherBound = 5000;
+
+
+
 
         public Enemy() : base(5, 5, 5, 5)
         {
