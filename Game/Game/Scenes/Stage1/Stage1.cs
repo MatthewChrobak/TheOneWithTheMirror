@@ -10,7 +10,6 @@ using Game.Models.Entities;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
-using System.Collections.Generic;
 
 namespace Game.Scenes.Stage1
 {
@@ -137,6 +136,7 @@ namespace Game.Scenes.Stage1
                     var newPlayer = new Player(e.JoystickID);
                     this.players[e.JoystickID] = newPlayer;
                     this.players[e.JoystickID].ChunkLoader += map.LoadChunk; // Remove event when changing scenes
+                    newPlayer.CollisionHandler += this.map.GetMaximumColllisions;
                     this.map.AddEntity(newPlayer);
 
                     SceneManager.Singleton.LoadScene<CharacterSelection>();
