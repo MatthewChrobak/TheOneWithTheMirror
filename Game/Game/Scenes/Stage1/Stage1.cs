@@ -67,6 +67,19 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("rotateRegenPotion", PriorityType.LOGIC, UpdateRegenPotionAnimation, 100);
             this.Events.AddEvent("rotateSpeedRing", PriorityType.LOGIC, UpdateSpeedRingAnimation, 100);
 
+            this.Events.AddEvent("ant-fireballs", PriorityType.LOGIC, () => {
+
+                foreach (var entity in this.map.GetEntities(entity => entity as Enemy != null)) {
+                    var enemy = entity as Enemy;
+
+                    if (enemy.IsAnt) {
+                        enemy.CastFireball();
+                    }
+                }
+
+                return ControlEvent.NONE;
+            }, 5000);
+
 
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
@@ -228,7 +241,8 @@ namespace Game.Scenes.Stage1
                         dy = 0;
                     }
 
-                    if (dx == -1 && dy == -1) {
+                    if (dx == -1) {
+                        dx = 0;
                         if (target.Position.X > enemy.Position.X) {
                             dx += enemy.enemyMovementSpeed;
                         }
@@ -236,7 +250,10 @@ namespace Game.Scenes.Stage1
                         if (target.Position.X < enemy.Position.X) {
                             dx -= enemy.enemyMovementSpeed;
                         }
+                    }
 
+                    if (dy == -1) {
+                        dy = 0;
                         if (target.Position.Y > enemy.Position.Y) {
                             dy += enemy.enemyMovementSpeed;
                         }

@@ -6,6 +6,7 @@ using Annex.Graphics.Contexts;
 using Game.Models.Entities;
 using Game.Models.Entities.Hitboxes;
 using Game.Scenes;
+using Game.Scenes.Stage1;
 using System;
 
 namespace Game.Models
@@ -33,6 +34,11 @@ namespace Game.Models
                     };
             }
         }
+        private static SpriteSheetContext GetAntSprite(Vector position, Vector size) {
+            return new SpriteSheetContext("Aunt.png", 2, 4) {
+                RenderPosition = new OffsetVector(position, new ScalingVector(size, -0.5f, -0.5f))
+            };
+        }
 
         private readonly SolidRectangleContext _redHealthbar;
         private readonly SolidRectangleContext _greenHealthbar;
@@ -52,6 +58,7 @@ namespace Game.Models
         public const int positionXHigherBound = 800;
         public const int positionYLowerBound = 150;
         public const int positionYHigherBound = 600;
+        public readonly bool IsAnt = false;
 
         public Enemy() : base(10, 10, 10, 10) {
             this.Size = Vector.Create(32, 32);
@@ -78,7 +85,6 @@ namespace Game.Models
             var positionX = random.Next(positionXLowerBound, positionXHigherBound);
             var positionY = random.Next(positionYLowerBound, positionYHigherBound);
 
-            this._sprite = GetEnemySprite(this.Position, this.Size);
 
             //Generates a random speed for the enemy
             int speed = random.Next(enemyMovementSpeedLowerBound, enemyMovementSpeedHigherBound);
@@ -87,7 +93,25 @@ namespace Game.Models
 
             Position.X = positionX;
             Position.Y = positionY;
+
+
+            if (RNG.Next(100) < 10) {
+                IsAnt = true;
+                this._sprite = GetAntSprite(this.Position, this.Size);
+                this.enemyMovementSpeed = enemyMovementSpeedLowerBound;
+            } else {
+                IsAnt = false;
+                this._sprite = GetEnemySprite(this.Position, this.Size);
+            }
         }
+
+        public void CastFireball() {
+            var scene = SceneWithMap.CurrentScene;
+            if (scene is Stage1 s1) {
+
+            }
+        }
+
         public override void Draw(ICanvas canvas) {
             canvas.Draw(this._sprite);
             canvas.Draw(this._redHealthbar);
