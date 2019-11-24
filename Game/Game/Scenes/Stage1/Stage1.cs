@@ -168,7 +168,7 @@ namespace Game.Scenes.Stage1
 
                         if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
                         {
-                            AudioManager.Singleton.PlayAudio("Sharp_Punch.flac");
+                            //audio.PlayAudio("Sharp_Punch.flac");
                         }
                     }
                 }
