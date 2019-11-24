@@ -7,6 +7,7 @@ namespace Game.Models.Entities
     {
         public readonly Vector Position;
         public EntityType EntityType;
+        public int health;
 
 
         public Entity() {
