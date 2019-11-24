@@ -24,6 +24,7 @@ namespace Game.Models
         public Enemy() : base(5, 5, 5, 5)
         {
             this.EntityType = EntityType.Enemy;
+            this.health = 100;
             Random random = new Random();
             //Generates a random position for the enemy
             var positionX = random.Next(positionXLowerBound, positionXHigherBound);

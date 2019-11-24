@@ -232,6 +232,11 @@ namespace Game.Scenes.Stage1
                     CameraFocus(newPlayer);
                 }
             }
+            //attack button
+            if (e.Button == JoystickButton.B)
+            {
+                this.players[e.JoystickID].Attack(this.players[e.JoystickID].Position.X, this.players[e.JoystickID].Position.Y, this.map.GetEntities(enemy => enemy.EntityType == EntityType.Enemy));
+            }
         }
 
         public void CameraFocus(Player player)
