@@ -1,4 +1,5 @@
 using Annex;
+using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
@@ -21,6 +22,7 @@ namespace Game.Scenes.Stage1
         public Player[] players;
         public Enemy[] enemies;
 
+
         // MAP EDITING TOOLS
         public string MapBrush_Texture;
         public int MapBrush_Top;
@@ -34,63 +36,12 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
             this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
 
+            //audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
 
+            map.AddEntity(new Enemy());
 
-            for (var i = 0; i < (players.Length - 1); i++)
-            {
-                if (players[i] != null)
-                {
-                    var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
-                    var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
-
-                    var nextPlayerXDifference = currentPlayerXDifference;
-                    var nextPlayerYDifference = currentPlayerYDifference;
-
-                    if (players[i + 1] != null)
-                    {
-                        nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i + 1].Position.X);
-                        nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
-                    }
-
-                    if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) < Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
-                    {
-                        index = i;
-                    }
-                    else
-                    {
-                        index = i + 1;
-                    }
-
-
-                    if (players[index].Position.X > enemy.Position.X)
-                    {
-                        enemy.Position.X += enemy.enemyMovementSpeed;
-                    }
-
-                    if (players[index].Position.X < enemy.Position.X)
-                    {
-                        enemy.Position.X -= enemy.enemyMovementSpeed;
-                    }
-
-                    if (players[index].Position.Y > enemy.Position.Y)
-                    {
-                        enemy.Position.Y += enemy.enemyMovementSpeed;
-                    }
-
-                    if (players[index].Position.Y < enemy.Position.Y)
-                    {
-                        enemy.Position.Y -= enemy.enemyMovementSpeed;
-                    }
-
-
-
-                    if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
-                    {
-                        audio.PlayAudio("Sharp_Punch.flac");
-                    }
-                }
-            }
-
+            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+            this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
 
             Debug.AddDebugCommand("savemap", (data) => {
                 map.Save();
@@ -161,7 +112,85 @@ namespace Game.Scenes.Stage1
             base.Draw(canvas);
         }
 
+        private ControlEvent AddEnemy()
+        {
+            map.AddEntity(new Enemy());
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent UpdateEnemyPositions()
+        {
+
+            foreach (var entity in map.GetEntities(entity => entity.EntityType == EntityType.Enemy))
+            {
+                var enemy = entity as Enemy;
+
+                var index = 0;
+
+                var playerList = map.GetEntities(entity => entity.EntityType == EntityType.Player);
+
+
+                for (var i = 0; i < (players.Length - 1); i++)
+                {
+                    if (players[i] != null)
+                    {
+                        var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
+                        var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
+
+                        var nextPlayerXDifference = currentPlayerXDifference;
+                        var nextPlayerYDifference = currentPlayerYDifference;
+
+                        if (players[i + 1] != null)
+                        {
+                            nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i + 1].Position.X);
+                            nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
+                        }
+
+                        if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) < Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
+                        {
+                            index = i;
+                        }
+                        else
+                        {
+                            index = i + 1;
+                        }
+
+
+                        if (players[index].Position.X > enemy.Position.X)
+                        {
+                            enemy.Position.X += enemy.enemyMovementSpeed;
+                        }
+
+                        if (players[index].Position.X < enemy.Position.X)
+                        {
+                            enemy.Position.X -= enemy.enemyMovementSpeed;
+                        }
+
+                        if (players[index].Position.Y > enemy.Position.Y)
+                        {
+                            enemy.Position.Y += enemy.enemyMovementSpeed;
+                        }
+
+                        if (players[index].Position.Y < enemy.Position.Y)
+                        {
+                            enemy.Position.Y -= enemy.enemyMovementSpeed;
+                        }
+
+
+
+                        if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                        {
+                            audio.PlayAudio("Sharp_Punch.flac");
+                        }
+                    }
+                }
+            }
+
+            return ControlEvent.NONE;
+        }
+
         private ControlEvent CheckForNewInput() {
+
             var canvas = GameWindow.Singleton.Canvas;
 
             for (uint i = 0; i < 4; i++) {
