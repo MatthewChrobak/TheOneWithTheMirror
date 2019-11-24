@@ -23,12 +23,14 @@ namespace Game.Scenes.Stage1
         public string MapBrush_Texture;
         public int MapBrush_Top;
         public int MapBrush_Left;        
+        public string MapBrush_Mode = "single";
 
         public Stage1() {
             players = new Player[4];
 
             this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
+            this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
 
             Debug.AddDebugCommand("savemap", (data) => {
                 map.Save();
@@ -82,6 +84,15 @@ namespace Game.Scenes.Stage1
                 this.MapBrush_Texture = data[0];
                 this.MapBrush_Top = int.Parse(data[1]);
                 this.MapBrush_Left = int.Parse(data[2]);
+            });
+            Debug.AddDebugCommand("setbrushmode", (data) => {
+                this.MapBrush_Mode = data[0].ToLower();
+
+                if (this.MapBrush_Mode == "random") {
+                    for (int i = 1; i < data.Length; i++) {
+                        // TODO:
+                    }
+                }
             });
         }
 
@@ -233,9 +244,22 @@ namespace Game.Scenes.Stage1
                 return;
             }
 
-            if (e.Button == MouseButton.Left) {
+            if (e.Button == MouseButton.Left)
+            {
                 this.RemoveBrushEvent = true;
             }
+
+        }
+
+        private ControlEvent IsChunkRemovable()
+        {
+            foreach(var player in this.players)
+            {
+                if(player != null)
+                    this.map.UnloadChunk(player.CurrentXChunkID, player.CurrentYChunkID);
+            }
+
+            return ControlEvent.NONE;
         }
     }
 }

@@ -13,8 +13,8 @@ namespace Game.Models.Entities
     public class Player : Entity
     {
         private (int x, int y) LastChunkID = (int.MinValue, int.MinValue);
-        private int CurrentXChunkID => (int)Math.Floor(this.Position.X / MapChunk.ChunkWidth);
-        private int CurrentYChunkID => (int)Math.Floor(this.Position.Y / MapChunk.ChunkHeight);
+        public int CurrentXChunkID => (int)Math.Floor(this.Position.X / MapChunk.ChunkWidth);
+        public int CurrentYChunkID => (int)Math.Floor(this.Position.Y / MapChunk.ChunkHeight);
         public event Action<int, int> ChunkLoader;
 
         public SpriteSheetContext _sprite;
