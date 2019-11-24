@@ -94,6 +94,11 @@ namespace Game.Scenes.Stage1
                     }
                 }
             });
+
+            Debug.AddDebugCommand("additem", (data) =>
+            {
+                map.AddEntity(new Item());
+            });
         }
 
         public override void Draw(ICanvas canvas) {

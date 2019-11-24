@@ -92,6 +92,7 @@ namespace Game.Models.Entities
                 e.SetInterval(slowedFrameIntervals);
             }
 
+            ChangeDirection();
             float speed = 2;
             float signX = (this.dx / 100) * speed;
             float signY = (this.dy / 100) * speed;
@@ -108,6 +109,39 @@ namespace Game.Models.Entities
                 return ControlEvent.REMOVE;
             }
             return ControlEvent.NONE;
+           
+        }
+
+        public void ChangeDirection()
+        {
+            var angle = Math.Atan2(dy, dx) * (180 / Math.PI);
+
+            //left
+            if(dx < - 50)
+            {
+                if (this._sprite.Row % 2 == 1)
+                {
+                    this._sprite.StepRow();
+                }
+            }
+            //right
+            else if(dx > 50)
+            {                
+                if(this._sprite.Row % 2 == 0)
+                {
+                    this._sprite.StepRow();
+                }                
+            }
+            //down
+            else if(dy > 50 && dx < 50 && dx > 0)
+            {
+
+            }
+            //up
+            else if(dy < -50 && dx < 50 && dx > 0)
+            {
+
+            }
         }
 
         public void HasMovedToNewChunk() {
