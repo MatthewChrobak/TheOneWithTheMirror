@@ -32,8 +32,7 @@ namespace Game.Models
 
 
 
-        public Enemy() : base(10, 10, 10, 10)
-        {
+        public Enemy() : base(10, 10, 10, 10) {
             this.Size = Vector.Create(30, 30);
 
             var healthbarSize = Vector.Create(50, 5);
@@ -66,30 +65,32 @@ namespace Game.Models
             Position.X = positionX;
             Position.Y = positionY;
 
-            this._sprite = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
-            {
+            this._sprite = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1) {
                 RenderPosition = new OffsetVector(this.Position, -15, -15),
                 RenderSize = Size
             };
         }
-        public override void Draw(ICanvas canvas)
-        {
+        public override void Draw(ICanvas canvas) {
             canvas.Draw(this._sprite);
             canvas.Draw(this._redHealthbar);
             canvas.Draw(this._greenHealthbar);
             base.Draw(canvas);
         }
 
-        public override void OnDeath()
-        {
+        public override void OnDeath() {
             var scene = SceneWithMap.CurrentScene;
             var map = scene.map;
 
             map.RemoveEntity(this);
+
+            if (RNG.Next(100) <= 10) {
+                var fly = new Flies();
+                fly.Position.Set(this.Position);
+                map.AddEntity(fly);
+            }
         }
 
-        public override void OnCollision(HitboxEntity entity)
-        {
+        public override void OnCollision(HitboxEntity entity) {
             if (entity is PlayerHitbox playerHitbox) {
 
                 if (EventManager.CurrentTime - LastAttacked < 1000) {

@@ -29,6 +29,13 @@ namespace Game.Models.Entities.Hitboxes
             if (entity is Item item) {
                 this.Player.GetBuff(item.buffType);
             }
+
+            if (entity is Flies fly) {
+                var scene = SceneWithMap.CurrentScene;
+                scene.map.RemoveEntity(fly);
+
+                this.Player.Health.Current.Value += 10;
+            }
         }
     }
 }
