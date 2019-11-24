@@ -53,28 +53,37 @@ namespace Game.Models.Chunks
             this._mapEntities.Remove(e);
         }
 
-        public (float x, float y) GetMaximumColllisions(HitboxEntity entity) {
-            float maxX = 0;
-            float maxY = 0;
+        public (float x, float y) GetMapBorderCollisions(HitboxEntity entity) {
+            float x = 0;
+            float y = 0;
 
             if (entity.RealLeft < 0) {
-                maxX = -entity.RealLeft;
+                x = -entity.RealLeft;
             }
             if (entity.RealTop < 0) {
-                maxY = -entity.RealTop;
+                y = -entity.RealTop;
             }
-            if (entity.RealRight > Map.Size_X) {
-                maxX = -(entity.RealRight - Map.Size_X);
+            if (entity.RealRight >= Map.Size_X) {
+                x = -(entity.RealRight - Map.Size_X);
             }
-            if (entity.RealBottom > Map.Size_Y) {
-                maxY = -(entity.Position.Y - Map.Size_Y);
+            if (entity.RealBottom >= Map.Size_Y) {
+                y = -(entity.RealBottom - Map.Size_Y);
             }
+
+             return (x, y);
+        }
+
+        public (float x, float y) GetMaximumColllisions(HitboxEntity entity) {
+            (float maxX, float maxY) = GetMapBorderCollisions(entity);
 
             if (maxX != 0 || maxY != 0) {
                 return (maxX, maxY);
             }
 
-            foreach (var otherEntity in this._mapEntities) {
+            var entities = this._mapEntities.ToList();
+            for (int i = 0; i < entities.Count; i++)
+            {
+                var otherEntity = entities[i];
                 if (otherEntity == entity) {
                     continue;
                 }

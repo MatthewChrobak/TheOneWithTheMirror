@@ -1,6 +1,7 @@
 ﻿using Annex;
 using Annex.Events;
 using Annex.Graphics;
+using Game.Models.Entities;
 using Game.Scenes.MainMenu;
 
 namespace Game
@@ -16,6 +17,10 @@ namespace Game
             drawEvent.AttachTracker(tracker);
 
             Debug.AddDebugInformation(() => $"FPS: {tracker.LastCount}");
+
+            Debug.AddDebugCommand("togglehitboxes", (data) => {
+                HitboxEntity.RenderHitboxes = !HitboxEntity.RenderHitboxes;
+            });
 
             game.Start<MainMenu>();
         }

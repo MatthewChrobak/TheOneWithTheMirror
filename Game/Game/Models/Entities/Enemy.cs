@@ -1,7 +1,12 @@
-﻿using Annex.Data.Shared;
+﻿using Annex.Data;
+using Annex.Data.Shared;
+using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
+using Annex.Scenes;
 using Game.Models.Entities;
+using Game.Models.Entities.Hitboxes;
+using Game.Scenes;
 using System;
 
 namespace Game.Models
@@ -10,6 +15,8 @@ namespace Game.Models
     {
         private readonly SpriteSheetContext _sprite;
         public readonly int enemyMovementSpeed;
+
+        private long LastAttacked = 0;
 
         public const int enemyMovementSpeedLowerBound = 1;
         public const int enemyMovementSpeedHigherBound = 4;
@@ -21,10 +28,9 @@ namespace Game.Models
 
 
 
-        public Enemy() : base(5, 5, 5, 5)
+        public Enemy() : base(10, 10, 10, 10)
         {
             this.EntityType = EntityType.Enemy;
-            this.health = 100;
             Random random = new Random();
             //Generates a random position for the enemy
             var positionX = random.Next(positionXLowerBound, positionXHigherBound);
@@ -40,14 +46,38 @@ namespace Game.Models
 
             this._sprite = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
             {
-                RenderPosition = this.Position,
-                RenderSize = Vector.Create(10, 10)
+                RenderPosition = new OffsetVector(this.Position, -15, -15),
+                RenderSize = Vector.Create(30, 30)
             };
         }
         public override void Draw(ICanvas canvas)
         {
             canvas.Draw(this._sprite);
             base.Draw(canvas);
+        }
+
+        public override void OnDeath()
+        {
+            var scene = SceneWithMap.CurrentScene;
+            var map = scene.map;
+
+            map.RemoveEntity(this);
+        }
+
+        public override void OnCollision(HitboxEntity entity)
+        {
+            if (entity is PlayerHitbox playerHitbox) {
+
+                if (EventManager.CurrentTime - LastAttacked < 1000) {
+                    return;
+                }
+                this.LastAttacked = EventManager.CurrentTime;
+
+                playerHitbox.Player.Damage(1);
+
+                var scene = SceneWithMap.CurrentScene;
+                scene.AddScrollingMessage(new ScrollingTextMessage("-1", entity.Position.X, entity.Position.Y, RGBA.Purple));
+            }
         }
     }
 }

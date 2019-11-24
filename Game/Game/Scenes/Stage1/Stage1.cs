@@ -1,24 +1,21 @@
 using Annex;
-using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
-using Annex.Graphics.Contexts;
 using Annex.Graphics.Events;
 using Annex.Scenes;
-using Annex.Scenes.Components;
 using Game.Models;
-using Game.Models.Chunks;
 using Game.Models.Entities;
+using Game.Models.Entities.Items;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
+using System.Linq;
 
 namespace Game.Scenes.Stage1
 {
-    public class Stage1 : Scene
+    public class Stage1 : SceneWithMap
     {
-        public readonly Map map;
         public Player[] players;
         public Enemy[] enemies;
 
@@ -31,17 +28,18 @@ namespace Game.Scenes.Stage1
         public int enemyCount = 0;
         public const int  maximumEnemy = 100;
 
-        public Stage1() {
+        public Stage1() : base("stage1") {
             this.Size.Set(500, 500);
-            players = new Player[4];
+            players = new Player[6];
 
-            this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
 
             map.AddEntity(new Enemy());
+            map.AddEntity(new Sword());
 
-            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+            //this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
+            this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
 
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
@@ -90,13 +88,8 @@ namespace Game.Scenes.Stage1
 
             Debug.AddDebugCommand("additem", (data) =>
             {
-                map.AddEntity(new Item());
+                map.AddEntity(new Sword());
             });
-        }
-
-        public override void Draw(ICanvas canvas) {
-            map.Draw(canvas);
-            base.Draw(canvas);
         }
 
         private ControlEvent AddEnemy()
@@ -108,11 +101,22 @@ namespace Game.Scenes.Stage1
             }
             return ControlEvent.NONE;
         }
+        private ControlEvent UpdateSwordAnimation()
+        {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.Sword);
 
+            foreach(var entity in entities)
+            {
+                if (entity is Sword item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
+        }
         private ControlEvent UpdateEnemyPositions()
         {
-
-            foreach (var entity in map.GetEntities(entity => entity.EntityType == EntityType.Enemy))
+            var enemyList = map.GetEntities(entity => entity.EntityType == EntityType.Enemy).ToList();
+            foreach (var entity in enemyList)
             {
                 var enemy = entity as Enemy;
 
@@ -222,11 +226,14 @@ namespace Game.Scenes.Stage1
                     var newPlayer = new Player(e.JoystickID);
                     this.players[e.JoystickID] = newPlayer;
                     newPlayer.CollisionHandler += this.map.GetMaximumColllisions;
+                    newPlayer.BorderCollisionHandler += this.map.GetMapBorderCollisions;
                     this.map.AddEntity(newPlayer);
 
                     SceneManager.Singleton.LoadScene<CharacterSelection>();
                     var characterSelection = SceneManager.Singleton.CurrentScene as CharacterSelection;
-                    characterSelection.EditingPlayer = this.players[e.JoystickID];  
+                    characterSelection.EditingPlayer = this.players[e.JoystickID];
+
+                    this.AddChild(new PlayerOverlay(newPlayer));
                     
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
                     CameraFocus(newPlayer);
@@ -235,7 +242,6 @@ namespace Game.Scenes.Stage1
             //attack button
             if (e.Button == JoystickButton.B)
             {
-                this.players[e.JoystickID].Attack(this.players[e.JoystickID].Position.X, this.players[e.JoystickID].Position.Y, this.map.GetEntities(enemy => enemy.EntityType == EntityType.Enemy));
             }
         }
 
@@ -262,7 +268,7 @@ namespace Game.Scenes.Stage1
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.Space) {
+            if (e.Key == KeyboardKey.Insert) {
                 Debug.ToggleDebugOverlay();
             }
 

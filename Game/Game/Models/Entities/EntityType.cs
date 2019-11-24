@@ -4,6 +4,9 @@
     {
         Player,
         Enemy,
+        Buffs,
+        Sword,
+        PoisonArrow,
         None
     }
 }
