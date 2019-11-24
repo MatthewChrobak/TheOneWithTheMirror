@@ -9,6 +9,9 @@ namespace Game.Models.Entities
         Sword,
         PoisonArrow,
         Fly,
+        PoisonBow,
+        Shield,
+        RegenPotion,
         None
     }
 }

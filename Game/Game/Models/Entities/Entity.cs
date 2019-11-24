@@ -21,8 +21,8 @@ namespace Game.Models.Entities
 
         public abstract void Draw(ICanvas canvas);
 
-        public void Damage(int damage) {
-            this.Health.Current.Value -= damage;
+        public void Damage(int damage, int modifier = 0) {
+            this.Health.Current.Value -= (damage + modifier);
 
             if (this.Health.Current.Value <= 0) {
                 this.OnDeath();

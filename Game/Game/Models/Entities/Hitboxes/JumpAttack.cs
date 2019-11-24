@@ -1,4 +1,5 @@
 ﻿using Annex.Data;
+using Game.Models.Buffs;
 using Game.Models.Entities.Items;
 using Game.Scenes;
 
@@ -7,6 +8,7 @@ namespace Game.Models.Entities.Hitboxes
     public class JumpAttack : HitboxEntity
     {
         public Player Player;
+        public int damageConstant = 25;
 
         public JumpAttack(Player player) : base(player.Position, 20, 20, 20, 20) {
             this.Player = player;
@@ -15,11 +17,11 @@ namespace Game.Models.Entities.Hitboxes
 
         public override void OnCollision(HitboxEntity entity) {
             if (entity.EntityType == EntityType.Enemy) {
-                entity.Damage(25);
+                entity.Damage(damageConstant, damageConstant += this.Player.GetBuff(BuffTypes.Damage) ? 10 : 0);
 
                 var scene = SceneWithMap.CurrentScene;
                 scene.AddScrollingMessage(new ScrollingTextMessage(
-                    "-25", 
+                    damageConstant.ToString(), 
                     entity.Position.X, 
                     entity.Position.Y, 
                     RGBA.Red
@@ -27,7 +29,12 @@ namespace Game.Models.Entities.Hitboxes
             }
 
             if (entity is Item item) {
-                this.Player.GetBuff(item.buffType);
+                this.Player.SetBuff(item.buffType);
+
+                //remove item after taking it
+                var scene = SceneWithMap.CurrentScene;
+                var map = scene.map;
+                map.RemoveEntity(entity);
             }
 
             if (entity is Flies fly) {

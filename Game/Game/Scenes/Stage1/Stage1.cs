@@ -38,8 +38,13 @@ namespace Game.Scenes.Stage1
 
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
 
+            //Initializing First Entities
             map.AddEntity(new Enemy());
             map.AddEntity(new Sword());
+            map.AddEntity(new PoisonBow());
+            map.AddEntity(new Shield());
+            map.AddEntity(new RegenPotion());
+
 
 
             audio.PlayBufferedAudio("AwesomeMusic.flac", "AwesomeMusic", true, 60);
@@ -48,6 +53,9 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
             this.Events.AddEvent("update-fly-positions", PriorityType.LOGIC, UpdateFlyPositions, 20);
             this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
+            this.Events.AddEvent("rotatePoisonArrow", PriorityType.LOGIC, UpdatePoisonBowAnimation, 100);
+            this.Events.AddEvent("rotateShield", PriorityType.LOGIC, UpdateShieldAnimation, 100);
+            this.Events.AddEvent("rotateRegenPotion", PriorityType.LOGIC, UpdateRegenPotionAnimation, 100);
 
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
@@ -99,8 +107,36 @@ namespace Game.Scenes.Stage1
             });
         }
 
-        private ControlEvent AddEnemy() {
-            if (enemyCount < maximumEnemy) {
+        private ControlEvent UpdateRegenPotionAnimation()
+        {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.RegenPotion);
+
+            foreach (var entity in entities)
+            {
+                if (entity is RegenPotion item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent UpdateShieldAnimation()
+        {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.Shield);
+
+            foreach (var entity in entities)
+            {
+                if (entity is Shield item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent AddEnemy()
+        {
+            if (enemyCount < maximumEnemy)
+            {
                 map.AddEntity(new Enemy());
                 enemyCount++;
             }
@@ -111,6 +147,19 @@ namespace Game.Scenes.Stage1
 
             foreach (var entity in entities) {
                 if (entity is Sword item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent UpdatePoisonBowAnimation()
+        {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.PoisonBow);
+
+            foreach (var entity in entities)
+            {
+                if (entity is PoisonBow item)
                     item._sprite.StepColumn();
             }
 
