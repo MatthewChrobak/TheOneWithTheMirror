@@ -13,7 +13,7 @@ namespace Game.Models
         {
 
             this.Position = Vector.Create();
-            this._sprite = new SpriteSheetContext("Pokemon.png", 25, 20)
+            this._sprite = new SpriteSheetContext("smushy.png", 1, 8)
             {
                 RenderPosition = Position
             };

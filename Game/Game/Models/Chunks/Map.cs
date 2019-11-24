@@ -1,5 +1,6 @@
 ﻿using Annex.Graphics;
 using Game.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,6 +42,15 @@ namespace Game.Models.Chunks
 
         public IEnumerable<Entity> GetOrderedEntities() {
             return this._mapEntities.OrderBy(e => e.Position.Y);
+        }
+
+        public IEnumerable<Entity> GetEntities(Func<Entity, bool> cmp = null)
+        {
+            if (cmp == null)
+            {
+                return this._mapEntities;
+            }
+            return this._mapEntities.Where(cmp);
         }
 
         public void RemoveEntity(Entity e) {

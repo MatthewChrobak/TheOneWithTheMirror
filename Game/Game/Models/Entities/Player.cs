@@ -31,6 +31,11 @@ namespace Game.Models.Entities
         private uint _joystickID;
 
         public Player(uint joystickID) {
+
+
+
+            this.EntityType = EntityType.Player;
+
             this._joystickID = joystickID;
 
             this._sprite = new SpriteSheetContext("smushy.png", 1, 8) {

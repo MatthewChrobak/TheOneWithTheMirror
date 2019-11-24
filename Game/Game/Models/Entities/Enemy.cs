@@ -1,26 +1,26 @@
 ﻿using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
+using Game.Models.Entities;
 using System;
 
 namespace Game.Models
 {
-    public class Enemy : IDrawableObject
+    public class Enemy : Entity
     {
         private readonly SpriteSheetContext _sprite;
-        public readonly Vector Position;
         public readonly int enemyMovementSpeed;
 
         public const int enemyMovementSpeedLowerBound = 1;
-        public const int enemyMovementSpeedHigherBound = 10;
-        public const int positionXLowerBound = 0;
-        public const int positionXHigherBound = 1000;
-        public const int positionYLowerBound = 0;
-        public const int positionYHigherBound = 1000;
+        public const int enemyMovementSpeedHigherBound = 5;
+        public const int positionXLowerBound = -5000;
+        public const int positionXHigherBound = -5000;
+        public const int positionYLowerBound = -5000;
+        public const int positionYHigherBound = -5000;
 
-        public Enemy()
+        public Enemy()  
         {
-            
+            this.EntityType = EntityType.Enemy;
             Random random = new Random();
             //Generates a random position for the enemy
             var positionX = random.Next(positionXLowerBound, positionXHigherBound);
@@ -30,18 +30,17 @@ namespace Game.Models
             int speed = random.Next(enemyMovementSpeedLowerBound, enemyMovementSpeedHigherBound);
 
             this.enemyMovementSpeed = speed;
-
-            this.Position = Vector.Create();
+            
             Position.X = positionX;
             Position.Y = positionY;
 
             this._sprite = new SpriteSheetContext("Pokemon.png", 25, 20)
             {
-                RenderPosition = Position
+                RenderPosition = this.Position,
+                RenderSize = Vector.Create(10, 10)
             };
         }
-
-        public void Draw(ICanvas canvas)
+        public override void Draw(ICanvas canvas)
         {
             canvas.Draw(this._sprite);
         }

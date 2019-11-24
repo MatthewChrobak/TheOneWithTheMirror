@@ -6,6 +6,7 @@ namespace Game.Models.Entities
     public abstract class Entity : IDrawableObject
     {
         public readonly Vector Position;
+        public EntityType EntityType;
 
         public Entity() {
             this.Position = Vector.Create();
