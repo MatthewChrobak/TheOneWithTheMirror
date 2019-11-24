@@ -39,13 +39,12 @@ namespace Game.Models.Entities
 
         public readonly uint _joystickID;
         private Dictionary<Buffs.BuffTypes, int> buffs;
-
+        
         public Player(uint joystickID) {
             this._joystickID = joystickID;
 
             this.hitbox = new PlayerHitbox(this, 10, 10, 10, 10);
-            AddHitboxToMap(this.hitbox);
-
+            AddHitboxToMap(this.hitbox);            
 
             var scene = SceneWithMap.CurrentScene;
             scene.Events.AddEvent($"KeyboardInput-{joystickID}", PriorityType.INPUT, HandlePlayerInput, 10, 0);
@@ -53,6 +52,13 @@ namespace Game.Models.Entities
             Debug.AddDebugInformation(() => $"Angle: {angle}");
 
             buffs = new Dictionary<Buffs.BuffTypes, int>();
+
+
+            EventManager.Singleton.AddEvent(PriorityType.LOGIC, () =>
+            {
+                this.Health.Current.Value += this.Health.Regen.Value;
+                return ControlEvent.NONE;
+            }, 3000, 1000, "buff-regen");
         }
 
         private void AddHitboxToMap(HitboxEntity entity) {
@@ -196,21 +202,25 @@ namespace Game.Models.Entities
             }
         }
 
-        public bool GetBuff(BuffTypes types) {
-            return this.buffs.TryGetValue(types, out _) ? true : false;
+        public int GetBuff(BuffTypes types) {            
+            return this.buffs.TryGetValue(types, out int stack) ?  stack : 0;
         }
 
         public void SetBuff(BuffTypes type)
         {
+            buffs.TryGetValue(type, out int stack);
+            //false default value 0
+            if(stack == 0)
+            {
+                this.buffs.Add(type, ++stack);
+            }
+            else
+            {
+                this.buffs[type]++;
+            }            
+
             switch (type)
             {
-                case Buffs.BuffTypes.Damage:
-                    this.buffs.Add(BuffTypes.Damage, (int)BuffTypes.Damage);
-                    break;
-                case Buffs.BuffTypes.Defense:
-                    break;
-                case Buffs.BuffTypes.Speed:
-                    break;
                 case Buffs.BuffTypes.Chill:
                     break;
                 case Buffs.BuffTypes.MeleeResistance:
@@ -225,19 +235,18 @@ namespace Game.Models.Entities
                     break;
                 case Buffs.BuffTypes.DOT:
                     break;
-                case Buffs.BuffTypes.Regen:
-                    this.buffs.Add(BuffTypes.Regen, (int)BuffTypes.Regen);
+                case Buffs.BuffTypes.Regen:                    
+                    this.Health.Regen.Value = this.Health.Maximum * 0.01f * stack;                    
                     break;
                 case Buffs.BuffTypes.Lifesteal:
-                    this.buffs.Add(BuffTypes.Lifesteal, (int)BuffTypes.Lifesteal);
+                    //this.buffs.Add(BuffTypes.Lifesteal, (int)BuffTypes.Lifesteal);
                     break;
                 case Buffs.BuffTypes.Shield:
-                    this.buffs.Add(BuffTypes.Shield, (int)BuffTypes.Shield);
+                    //this.buffs.Add(BuffTypes.Shield, (int)BuffTypes.Shield);
                     break;
                 case Buffs.BuffTypes.COUNT:
                     break;
             }
         }
-
     }
 }

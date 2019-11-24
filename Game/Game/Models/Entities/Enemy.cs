@@ -26,7 +26,8 @@ namespace Game.Models
         public const int positionYHigherBound = 100;
 
 
-
+        private int totalDamageSeconds = 5;
+        private int damageSeconds = 0;
 
         public Enemy() : base(10, 10, 10, 10)
         {
@@ -48,7 +49,7 @@ namespace Game.Models
             {
                 RenderPosition = new OffsetVector(this.Position, -15, -15),
                 RenderSize = Vector.Create(30, 30)
-            };
+            };     
         }
         public override void Draw(ICanvas canvas)
         {
@@ -72,12 +73,31 @@ namespace Game.Models
                     return;
                 }
                 this.LastAttacked = EventManager.CurrentTime;
-
-                playerHitbox.Player.Damage(1);
+                
+                int defenseMultiplier = playerHitbox.Player.GetBuff(Buffs.BuffTypes.Defense);                
+                playerHitbox.Player.Damage(2, -defenseMultiplier);
 
                 var scene = SceneWithMap.CurrentScene;
                 scene.AddScrollingMessage(new ScrollingTextMessage("-1", entity.Position.X, entity.Position.Y, RGBA.Purple));
             }
+        }
+
+        public void DamageOverTime()
+        {
+            EventManager.Singleton.AddEvent(PriorityType.LOGIC, () =>
+            {
+                damageSeconds++;
+
+                if(damageSeconds >= totalDamageSeconds)
+                {
+                    damageSeconds = 0;
+                    return ControlEvent.REMOVE;
+                }
+                //Self damage
+                this.Damage(-(int)this.Health.Regen.Value);
+               
+                return ControlEvent.NONE;
+            }, 1000, 0, "buff-DOT");
         }
     }
 }

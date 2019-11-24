@@ -6,6 +6,7 @@ namespace Game.Models.Vitals
     {
         public Float Current = new Float(100);
         public Float Maximum = new Float(100);
+        public Float Regen = new Float(0);
 
         public Int GetRatio() {
             return new IntRatio(Current, Maximum);
