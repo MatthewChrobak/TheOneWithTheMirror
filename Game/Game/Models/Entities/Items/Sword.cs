@@ -3,6 +3,7 @@ using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
+using Game.Models.Chunks;
 
 namespace Game.Models.Entities.Items
 {
@@ -23,9 +24,7 @@ namespace Game.Models.Entities.Items
 
             //randomize the sword spanning
             System.Random random = new System.Random();
-            var map = SceneManager.Singleton.CurrentScene;
-            this.Position.Set(random.Next((int)map.Size.X), random.Next((int)map.Size.Y));
-
+            this.Position.Set(random.Next(Map.Size_X), random.Next(Map.Size_Y));
 
             this._text = new TextContext(this._name, "Default.ttf")
             {

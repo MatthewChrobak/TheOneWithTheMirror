@@ -3,6 +3,7 @@ using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Game.Models.Buffs;
+using Game.Models.Chunks;
 
 namespace Game.Models.Entities.Items
 {
@@ -20,6 +21,10 @@ namespace Game.Models.Entities.Items
                 RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, -16)),
                 RenderSize = Vector.Create(32, 32)
             };
+
+            //randomize the sword spanning
+            System.Random random = new System.Random();
+            this.Position.Set(random.Next(Map.Size_X), random.Next(Map.Size_Y));
 
             this._text = new TextContext(this._name, "Default.ttf")
             {
