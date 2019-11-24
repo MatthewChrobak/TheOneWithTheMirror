@@ -40,16 +40,26 @@ namespace Game.Scenes.MainMenu
             }
         }
 
-
-        public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e)
-        {
-            if (e.Button == JoystickButton.A)
-            {
-                SceneManager.Singleton.LoadScene<Stage1.Stage1>();
+        public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e) {
+            if (e.Button == JoystickButton.A) {
+                SceneManager.Singleton.LoadScene<Stage1.Stage1>(true);
             }
             if (e.Button == JoystickButton.Back)
             {
                 this.HandleCloseButtonPressed();
+            }
+        }
+
+        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
+            if (e.Key == KeyboardKey.Space) {
+                HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+                    Button = JoystickButton.A
+                });
+            }
+            if (e.Key == KeyboardKey.Escape) {
+                HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+                    Button = JoystickButton.Back
+                });
             }
         }
     }
