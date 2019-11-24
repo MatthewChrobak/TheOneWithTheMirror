@@ -56,5 +56,14 @@ namespace Game.Models
 
             map.RemoveEntity(this);
         }
+
+        public override void OnCollision(HitboxEntity entity)
+        {
+            //TODO: implement the enemy damage to player.
+            //if (entity.EntityType == EntityType.Player)
+            //{
+            //    entity.Damage(25);
+            //}
+        }
     }
 }
