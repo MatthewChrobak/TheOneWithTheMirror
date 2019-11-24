@@ -14,8 +14,9 @@ namespace Game.Scenes.Stage1.Elements
         public static int NumOverlays = 0;
 
         private static float width => GameWindow.RESOLUTION_WIDTH / 3;
-        private static float height => GameWindow.RESOLUTION_HEIGHT / 6;
+        private static float height => GameWindow.RESOLUTION_HEIGHT / 5;
 
+        private TextureContext _border;
         private TextureContext _icon;
         private TextureContext _healthbar;
         private TextContext _healthPercentage;
@@ -26,22 +27,24 @@ namespace Game.Scenes.Stage1.Elements
         public PlayerOverlay(Player player) : base("") {
             this._player = player;
 
-            float halfHeight = height / 2;
-            float quarterHeight = halfHeight / 2;
-            float eigthHeight = quarterHeight / 2;
-            float sixteenthHeight = eigthHeight / 2;
-            this._icon = new TextureContext("shia.png") {
+            this._border= new TextureContext("TotalOverlay.png") {
                 RenderPosition = GetPosition(),
-                RenderSize = Vector.Create(halfHeight, halfHeight),
-                UseUIView = true
+                RenderSize = Vector.Create(width, height),
+                UseUIView = true,
+                RenderColor = RGBA.Red
             };
             this._healthbar = new TextureContext("healthbar.png") {
-                RenderPosition = new OffsetVector(GetPosition(), quarterHeight, sixteenthHeight),
+                RenderPosition = GetPosition(),
                 RenderSize = new ScalingVector(
-                    Vector.Create(width - (quarterHeight + halfHeight), eigthHeight), 
+                    Vector.Create(width, height), 
                     Vector.Create(player.Health.GetPureRatio(), 1)),
                 UseUIView = true,
-                SourceTextureRect = new IntRect(0, 0, new ScalingInt(3, player.Health.GetRatio()), 50)
+                SourceTextureRect = new IntRect(0, 0, new ScalingInt(6, player.Health.GetRatio()), 320)
+            };
+            this._icon = new TextureContext("Icon-1.png") {
+                RenderPosition = GetPosition(),
+                RenderSize = Vector.Create(width, height),
+                UseUIView = true
             };
             this._healthPercentage = new TextContext("100%", "default.ttf") {
                 RenderPosition = GetPosition(),
@@ -52,7 +55,7 @@ namespace Game.Scenes.Stage1.Elements
                 Alignment = new TextAlignment() {
                     HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Top,
-                    Size = Vector.Create(width, halfHeight)
+                    Size = Vector.Create(width, height)
                 },
                 UseUIView = true
             };
@@ -83,6 +86,7 @@ namespace Game.Scenes.Stage1.Elements
 
         public override void Draw(ICanvas canvas) {
             _healthPercentage.RenderText = $"{_player.Health.GetRatio().Value}%";
+            canvas.Draw(this._border);
             canvas.Draw(this._healthbar);
             canvas.Draw(this._healthPercentage);
             canvas.Draw(this._icon);
