@@ -4,20 +4,18 @@ using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Game.Models.Buffs;
 
-namespace Game.Models.Entities
+namespace Game.Models.Entities.Items
 {
-    class Item : HitboxEntity
+    public class PoisonArrow : Item
     {
         public SpriteSheetContext _sprite;
         public TextContext _text;
-        public string _name = "Test";
-        public BuffTypes buffType;
+        public String _name = "Sword";
 
-        public Item() : base(5, 5, 5, 5)
+        public PoisonArrow()
         {
-            EntityType = EntityType.Buffs;
-
-            this._sprite = new SpriteSheetContext("Clawdia_Direction_Anim.png", 4, 8)
+            this.EntityType = EntityType.PoisonArrow;
+            this._sprite = new SpriteSheetContext("Sword_Sprite_Sheet.png", 1, 23)
             {
                 RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, -16)),
                 RenderSize = Vector.Create(32, 32)

@@ -6,6 +6,7 @@ using Annex.Graphics.Events;
 using Annex.Scenes;
 using Game.Models;
 using Game.Models.Entities;
+using Game.Models.Entities.Items;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
@@ -28,9 +29,11 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
 
             map.AddEntity(new Enemy());
+            map.AddEntity(new Sword());
 
             //this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
+            this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
 
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
@@ -79,7 +82,7 @@ namespace Game.Scenes.Stage1
 
             Debug.AddDebugCommand("additem", (data) =>
             {
-                map.AddEntity(new Item());
+                map.AddEntity(new Sword());
             });
         }
 
@@ -88,7 +91,18 @@ namespace Game.Scenes.Stage1
             map.AddEntity(new Enemy());
             return ControlEvent.NONE;
         }
+        private ControlEvent UpdateSwordAnimation()
+        {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.Sword);
 
+            foreach(var entity in entities)
+            {
+                if (entity is Sword item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
+        }
         private ControlEvent UpdateEnemyPositions()
         {
             var enemyList = map.GetEntities(entity => entity.EntityType == EntityType.Enemy).ToList();
