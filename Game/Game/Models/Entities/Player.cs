@@ -5,6 +5,7 @@ using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
+using Game.Models.Buffs;
 using Game.Models.Chunks;
 using Game.Scenes.Stage1;
 using System;
@@ -193,11 +194,51 @@ namespace Game.Models.Entities
 
             if(entity is Item item)
             {
-                int stack = 0;
-                if(buffs.TryGetValue(item.buffType, out stack))
-                {
+                GetBuff(item.buffType);
+            }
+        }
 
-                }
+        public void GetBuff(BuffTypes type)
+        {
+            int stack = 0;            
+            switch (type)
+            {
+                case Buffs.BuffTypes.Damage:
+                    if(buffs.TryGetValue(type, out stack))
+                    {
+                        buffs[type] = stack++;
+                    }
+                    else
+                    {
+                        buffs[type] = 1;
+                    }
+                    break;
+                case Buffs.BuffTypes.Defense:
+                    break;
+                case Buffs.BuffTypes.Speed:
+                    break;
+                case Buffs.BuffTypes.Chill:
+                    break;
+                case Buffs.BuffTypes.MeleeResistance:
+                    break;
+                case Buffs.BuffTypes.RangeResistance:
+                    break;
+                case Buffs.BuffTypes.PoisonResistance:
+                    break;
+                case Buffs.BuffTypes.Big:
+                    break;
+                case Buffs.BuffTypes.Splash:
+                    break;
+                case Buffs.BuffTypes.DOT:
+                    break;
+                case Buffs.BuffTypes.Regen:
+                    break;
+                case Buffs.BuffTypes.Lifesteal:
+                    break;
+                case Buffs.BuffTypes.Shield:
+                    break;
+                case Buffs.BuffTypes.COUNT:
+                    break;
             }
         }
     }
