@@ -4,6 +4,7 @@
     {
         Player,
         Enemy,
+        Buffs,
         None
     }
 }

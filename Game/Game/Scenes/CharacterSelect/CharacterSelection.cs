@@ -26,7 +26,7 @@ namespace Game.Scenes.CharacterSelect
         {
             for (int i = 0; i < characters.Length; i++)
             {
-                characters[i] = new SpriteSheetContext("Clawdia_Direction_Anim-LeftRightt.png", 2, 8)
+                characters[i] = new SpriteSheetContext("Clawdia_Direction_Anim-Sheet.png", 8, 8)
                 {                    
                     RenderSize = Vector.Create(64, 64)
                 };
