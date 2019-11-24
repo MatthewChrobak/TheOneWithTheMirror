@@ -15,7 +15,6 @@ namespace Game.Models.Entities
         private (int x, int y) LastChunkID = (int.MinValue, int.MinValue);
         public int CurrentXChunkID => (int)Math.Floor(this.Position.X / MapChunk.ChunkWidth);
         public int CurrentYChunkID => (int)Math.Floor(this.Position.Y / MapChunk.ChunkHeight);
-        public event Action<int, int> ChunkLoader;
         public event Func<HitboxEntity, (float x, float y)> CollisionHandler;
 
         public SpriteSheetContext _sprite;
@@ -98,16 +97,12 @@ namespace Game.Models.Entities
             float signX = (this.dx / 100) * speed;
             float signY = (this.dy / 100) * speed;
             this.Position.Add(signX * speed, signY * speed);
-
             var collisions = CollisionHandler?.Invoke(this);
-
-
             this.Position.Add(collisions.Value.x, collisions.Value.y);
             if (collisions.Value.x != 0 || collisions.Value.y != 0) {
                 return ControlEvent.REMOVE;
             }
 
-            HasMovedToNewChunk();
             return ControlEvent.NONE;
         }
 
@@ -118,19 +113,6 @@ namespace Game.Models.Entities
                 return ControlEvent.REMOVE;
             }
             return ControlEvent.NONE;
-        }
-
-        public void HasMovedToNewChunk() {
-            if (LastChunkID.x != CurrentXChunkID || LastChunkID.y != CurrentYChunkID) {
-                this.LastChunkID = (CurrentXChunkID, CurrentYChunkID);
-
-                int chunkDistance = 0;
-                for (int y = -chunkDistance; y <= chunkDistance; y++) {
-                    for (int x = -chunkDistance; x <= chunkDistance; x++) {
-                        ChunkLoader?.Invoke(CurrentXChunkID + y, CurrentYChunkID + x);
-                    }
-                }
-            }
         }
     }
 }
