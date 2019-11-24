@@ -1,7 +1,9 @@
 ﻿using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
+using Annex.Scenes;
 using Game.Models.Entities;
+using Game.Scenes.Stage1;
 using System;
 
 namespace Game.Models
@@ -45,6 +47,14 @@ namespace Game.Models
         {
             canvas.Draw(this._sprite);
             base.Draw(canvas);
+        }
+
+        public override void OnDeath()
+        {
+            var stage1 = SceneManager.Singleton.CurrentScene as Stage1;
+            var map = stage1.map;
+
+            map.RemoveEntity(this);
         }
     }
 }

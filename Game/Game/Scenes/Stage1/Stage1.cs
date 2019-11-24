@@ -13,6 +13,7 @@ using Game.Models.Entities;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
+using System.Linq;
 
 namespace Game.Scenes.Stage1
 {
@@ -101,8 +102,8 @@ namespace Game.Scenes.Stage1
 
         private ControlEvent UpdateEnemyPositions()
         {
-
-            foreach (var entity in map.GetEntities(entity => entity.EntityType == EntityType.Enemy))
+            var enemyList = map.GetEntities(entity => entity.EntityType == EntityType.Enemy).ToList();
+            foreach (var entity in enemyList)
             {
                 var enemy = entity as Enemy;
 

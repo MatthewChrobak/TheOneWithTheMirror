@@ -1,4 +1,5 @@
-﻿using Annex.Data;
+﻿using System;
+using Annex.Data;
 using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
@@ -37,6 +38,21 @@ namespace Game.Models.Entities
         }
 
         public virtual void OnCollision(HitboxEntity entity) {
+
+        }
+
+        internal void Damage(int damage)
+        {
+            this.health -= damage;
+
+            if (this.health <= 0)
+            {
+                this.OnDeath();
+            }
+        }
+
+        public virtual void OnDeath()
+        {
 
         }
     }
