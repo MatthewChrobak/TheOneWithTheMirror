@@ -44,8 +44,7 @@ namespace Game.Scenes.Stage1
             map.AddEntity(new PoisonBow());
             map.AddEntity(new Shield());
             map.AddEntity(new RegenPotion());
-
-
+            map.AddEntity(new SpeedRing());
 
             audio.PlayBufferedAudio("AwesomeMusic.flac", "AwesomeMusic", true, 60);
 
@@ -55,6 +54,8 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("rotatePoisonArrow", PriorityType.LOGIC, UpdatePoisonBowAnimation, 100);
             this.Events.AddEvent("rotateShield", PriorityType.LOGIC, UpdateShieldAnimation, 100);
             this.Events.AddEvent("rotateRegenPotion", PriorityType.LOGIC, UpdateRegenPotionAnimation, 100);
+            this.Events.AddEvent("rotateSpeedRing", PriorityType.LOGIC, UpdateSpeedRingAnimation, 100);
+
 
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
@@ -105,6 +106,18 @@ namespace Game.Scenes.Stage1
             {
                 map.AddEntity(new Sword());
             });
+        }
+        private ControlEvent UpdateSpeedRingAnimation()
+        {
+            var entities = map.GetEntities(Entity => Entity.EntityType == EntityType.SpeedRing);
+
+            foreach (var entity in entities)
+            {
+                if (entity is SpeedRing item)
+                    item._sprite.StepColumn();
+            }
+
+            return ControlEvent.NONE;
         }
 
         private ControlEvent UpdateRegenPotionAnimation()

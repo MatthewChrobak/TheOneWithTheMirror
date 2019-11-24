@@ -9,6 +9,7 @@
         PoisonBow,
         Shield,
         RegenPotion,
+        SpeedRing,
         None
     }
 }
