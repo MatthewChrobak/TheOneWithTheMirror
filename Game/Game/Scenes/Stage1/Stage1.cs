@@ -24,7 +24,7 @@ namespace Game.Scenes.Stage1
 
 
         // MAP EDITING TOOLS
-        private uint debugPlayerID = 99;
+        private uint debugPlayerID = 0;
         public string MapBrush_Texture;
         public int MapBrush_Top;
         public int MapBrush_Left;        
@@ -187,10 +187,10 @@ namespace Game.Scenes.Stage1
 
 
 
-                        if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
-                        {
-                            audio.PlayAudio("Sharp_Punch.flac");
-                        }
+                        //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                        //{
+                        //    audio.PlayAudio("Sharp_Punch.flac");
+                        //}
                     }
                 }
             }

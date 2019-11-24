@@ -83,7 +83,7 @@ namespace Game.Models.Entities
         private ControlEvent Jump() {
             jumpCount++;
 
-            if (jumpCount == jumpFrames) {
+            if (jumpCount >= jumpFrames) {
                 return ControlEvent.REMOVE;
             } else if (jumpCount >= jumpFrames - framesBeforeSlowingDown) {
                 //var events = Events.GetEvent("Jump");
