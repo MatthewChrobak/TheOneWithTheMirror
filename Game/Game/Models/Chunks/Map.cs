@@ -1,44 +1,34 @@
-﻿using Annex.Graphics;
+﻿using Annex.Data.Shared;
+using Annex.Graphics;
+using Annex.Graphics.Contexts;
 using Game.Models.Entities;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Game.Models.Chunks
 {
     public class Map : IDrawableObject
     {
-        private Dictionary<(int x, int y), MapChunk> _chunks;
+        private TextureContext _background;
+        public const int Size_X = 500;
+        public const int Size_Y = 500;
         private HashSet<Entity> _mapEntities;
         public readonly string Name;
-        public string Folder => $"resources/maps/{Name}/";
-        public string GetChunkFile(int x, int y) => Folder + $"({x})({y}).json";
 
         public Map(string name) {
             this.Name = name;
-            this._chunks = new Dictionary<(int, int), MapChunk>();
             this._mapEntities = new HashSet<Entity>();
-        }
-
-        public MapChunk GetChunk(int x, int y) {
-            LoadChunk(x, y);
-            return this._chunks[(x, y)];
+            this._background = new TextureContext("Grassy-Tiles.png") {
+                SourceTextureRect = new IntRect(64, 64, 32, 32),
+                RenderSize = Vector.Create(Size_X, Size_Y)
+            };
         }
 
         public void Draw(ICanvas canvas) {
-            foreach (var value in this._chunks.Values) {
-                value.Draw(canvas);
-            }
+            canvas.Draw(this._background);
             foreach (var entity in this.GetOrderedEntities()) {
                 entity.Draw(canvas);
-            }
-        }
-
-        internal void Save() {
-            Directory.CreateDirectory(Folder);
-            foreach (var entry in this._chunks) {
-                Json.SaveChunk(GetChunkFile(entry.Key.x, entry.Key.y), entry.Value);
             }
         }
 
@@ -49,12 +39,6 @@ namespace Game.Models.Chunks
                 return this._mapEntities;
             }
             return this._mapEntities.Where(cmp);
-        }
-
-        public void LoadChunk(int x, int y) {
-            if (!this._chunks.ContainsKey((x, y))) {
-                this._chunks[(x, y)] = Json.LoadChunk(GetChunkFile(x, y)) ?? new MapChunk(x, y);
-            }
         }
 
         public void AddEntity(Entity e) {
@@ -72,6 +56,24 @@ namespace Game.Models.Chunks
         public (float x, float y) GetMaximumColllisions(HitboxEntity entity) {
             float maxX = 0;
             float maxY = 0;
+
+            if (entity.RealLeft < 0) {
+                maxX = -entity.RealLeft;
+            }
+            if (entity.RealTop < 0) {
+                maxY = -entity.RealTop;
+            }
+            if (entity.RealRight > Map.Size_X) {
+                maxX = -(entity.RealRight - Map.Size_X);
+            }
+            if (entity.RealBottom > Map.Size_Y) {
+                maxY = -(entity.Position.Y - Map.Size_Y);
+            }
+
+            if (maxX != 0 || maxY != 0) {
+                return (maxX, maxY);
+            }
+
             foreach (var otherEntity in this._mapEntities) {
                 if (otherEntity == entity) {
                     continue;

@@ -3,6 +3,7 @@ using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
+using Annex.Graphics.Contexts;
 using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
@@ -21,34 +22,21 @@ namespace Game.Scenes.Stage1
         public Player[] players;
         public Enemy[] enemies;
 
-
         // MAP EDITING TOOLS
         private uint debugPlayerID = 99;
-        public string MapBrush_Texture;
-        public int MapBrush_Top;
-        public int MapBrush_Left;        
-        public string MapBrush_Mode = "single";
-
-
-        public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
 
         public Stage1() {
+            this.Size.Set(500, 500);
             players = new Player[4];
 
             this.map = new Map("stage1");
-            this.map.LoadChunk(0, 0);
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
-
-            //audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
 
             map.AddEntity(new Enemy());
 
             this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
 
-            Debug.AddDebugCommand("savemap", (data) => {
-                map.Save();
-            });
             Debug.AddDebugCommand("enablekeys", (data) => {
                 var canvas = GameWindow.Singleton.Canvas;
                 this.Events.AddEvent("debug-keys", PriorityType.INPUT, () => {
@@ -92,21 +80,6 @@ namespace Game.Scenes.Stage1
                     Button = JoystickButton.A,
                     JoystickID = debugPlayerID
                 });
-            });
-
-            Debug.AddDebugCommand("setbrush", (data) => {
-                this.MapBrush_Texture = data[0];
-                this.MapBrush_Top = int.Parse(data[1]);
-                this.MapBrush_Left = int.Parse(data[2]);
-            });
-            Debug.AddDebugCommand("setbrushmode", (data) => {
-                this.MapBrush_Mode = data[0].ToLower();
-
-                if (this.MapBrush_Mode == "random") {
-                    for (int i = 1; i < data.Length; i++) {
-                        // TODO:
-                    }
-                }
             });
 
             Debug.AddDebugCommand("additem", (data) =>
@@ -192,7 +165,7 @@ namespace Game.Scenes.Stage1
 
                         if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
                         {
-                            audio.PlayAudio("Sharp_Punch.flac");
+                            AudioManager.Singleton.PlayAudio("Sharp_Punch.flac");
                         }
                     }
                 }
@@ -296,68 +269,6 @@ namespace Game.Scenes.Stage1
             if (e.Handled) {
                 return;
             }
-        }
-
-        private bool RemoveBrushEvent = false;
-        public override void HandleMouseButtonPressed(MouseButtonPressedEvent e) {
-            base.HandleMouseButtonPressed(e);
-
-            if (e.Handled) {
-                return;
-            }
-
-            if (e.Button == MouseButton.Left) {
-                if (MapBrush_Texture != null) {
-                    this.RemoveBrushEvent = false;
-                    var canvas = GameWindow.Singleton.Canvas;
-                    this.Events.AddEvent("map-brush", PriorityType.GRAPHICS, () => {
-                        var pos = canvas.GetGameWorldMousePos();
-
-                        int chunkXID = (int)Math.Floor(pos.X / MapChunk.ChunkWidth);
-                        int chunkYID = (int)Math.Floor(pos.Y / MapChunk.ChunkHeight);
-
-                        int relativeX = (int)pos.X % MapChunk.ChunkWidth;
-                        int relativeY = (int)pos.Y % MapChunk.ChunkHeight;
-
-                        if (relativeX < 0) {
-                            relativeX += MapChunk.ChunkWidth;
-                        }
-
-                        if (relativeY < 0) {
-                            relativeY += MapChunk.ChunkHeight;
-                        }
-
-                        int tileX = relativeX / Tile.TileWidth;
-                        int tileY = relativeY / Tile.TileHeight;
-
-                        var chunk = this.map.GetChunk(chunkXID, chunkYID);
-                        var tile = chunk.GetTile(tileX, tileY);
-
-                        tile.TextureName.Set(this.MapBrush_Texture);
-                        tile.Rect.Top.Set(this.MapBrush_Top);
-                        tile.Rect.Left.Set(this.MapBrush_Left);
-
-                        if (this.RemoveBrushEvent) {
-                            return ControlEvent.REMOVE;
-                        }
-                        return ControlEvent.NONE;
-                    }, 50);
-                }
-            }
-        }
-
-        public override void HandleMouseButtonReleased(MouseButtonReleasedEvent e) {
-            base.HandleMouseButtonReleased(e);
-
-            if (e.Handled) {
-                return;
-            }
-
-            if (e.Button == MouseButton.Left)
-            {
-                this.RemoveBrushEvent = true;
-            }
-
         }
     }
 }
