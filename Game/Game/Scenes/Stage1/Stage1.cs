@@ -9,10 +9,10 @@ using Annex.Scenes.Components;
 using Game.Models;
 using Game.Models.Chunks;
 using Game.Models.Entities;
+using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Game.Scenes.Stage1
 {
@@ -35,14 +35,15 @@ namespace Game.Scenes.Stage1
         // MAP EDITING TOOLS
         public string MapBrush_Texture;
         public int MapBrush_Top;
-        public int MapBrush_Left;
+        public int MapBrush_Left;        
+        public string MapBrush_Mode = "single";
 
      
 
         public Stage1()
         {
-                players = new Game.Models.Entities.Player[4];
-                audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
+            players = new Game.Models.Entities.Player[4];
+            audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
 
             this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
@@ -52,7 +53,6 @@ namespace Game.Scenes.Stage1
 
             this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
-
           
         }
 
@@ -128,10 +128,8 @@ namespace Game.Scenes.Stage1
                         }
                     }
                 }
-                  
-                
-            }
 
+            }
             return ControlEvent.NONE;
         }
 
@@ -148,9 +146,11 @@ namespace Game.Scenes.Stage1
                     continue;
                 }
 
-                if (canvas.IsJoystickConnected(i)) {
+                if (canvas.IsJoystickConnected(i))
+                {
                     var notification = this.GetElementById(ConnectNotification.ID);
-                    if (notification == null) {
+                    if (notification == null)
+                    {
                         this.AddChild(new ConnectNotification());
                     }
                 }
@@ -159,8 +159,10 @@ namespace Game.Scenes.Stage1
             return ControlEvent.NONE;
         }
 
-        public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e) {
-            if (e.Button == JoystickButton.Back) {
+        public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e)
+        {
+            if (e.Button == JoystickButton.Back)
+            {
                 SceneManager.Singleton.LoadScene<MainMenu.MainMenu>();
                 return;
             }
@@ -174,26 +176,36 @@ namespace Game.Scenes.Stage1
                     this.players[e.JoystickID].ChunkLoader += map.LoadChunk; // Remove event when changing scenes
                     this.map.AddEntity(newPlayer);
 
+                    SceneManager.Singleton.LoadScene<CharacterSelection>();
+                    var characterSelection = SceneManager.Singleton.CurrentScene as CharacterSelection;
+                    characterSelection.EditingPlayer = this.players[e.JoystickID];  
+                    
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
-
-                    // TODO: Move this to its own function.
-                    var v = newPlayer.Position;
-                    float count = 1;
-                    for (int i = 0; i < this.players.Length; i++) {
-                        if (i == e.JoystickID) {
-                            continue;
-                        }
-
-                        if (this.players[i] == null) {
-                            continue;
-                        }
-                        v = new OffsetVector(v, this.players[i].Position);
-                        count++;
-                    }
-                    v = new ScalingVector(v, 1 / count, 1 / count);
-                    GameWindow.Singleton.Canvas.GetCamera().Follow(v);
+                    CameraFocus(newPlayer);
                 }
             }
+        }
+
+        public void CameraFocus(Player player)
+        {
+            var v = player.Position;
+            float count = 1;
+            for (int i = 0; i < this.players.Length; i++)
+            {
+                if (i == player._joystickID)
+                {
+                    continue;
+                }
+
+                if (this.players[i] == null)
+                {
+                    continue;
+                }
+                v = new OffsetVector(v, this.players[i].Position);
+                count++;
+            }
+            v = new ScalingVector(v, 1 / count, 1 / count);
+            GameWindow.Singleton.Canvas.GetCamera().Follow(v);            
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
