@@ -8,6 +8,7 @@ using Game.Models.Entities.Hitboxes;
 using Game.Scenes;
 using Game.Scenes.Stage1;
 using System;
+using System.Linq;
 
 namespace Game.Models
 {
@@ -109,6 +110,16 @@ namespace Game.Models
             var scene = SceneWithMap.CurrentScene;
             if (scene is Stage1 s1) {
 
+                var availablePlayers = s1.players.Where(player => player?.isPlayerDead == false).ToArray();
+
+                if (availablePlayers.Length == 0) {
+                    return;
+                }
+
+                var target = availablePlayers[RNG.Next(availablePlayers.Length)];
+
+                var fireball = new Fireball(target, this.Position);
+                scene.map.AddEntity(fireball);
             }
         }
 
@@ -157,6 +168,13 @@ namespace Game.Models
             if (dx != 0 && dy != 0) {
                 this._sprite.StepColumn();
             }
+        }
+
+        public override bool ConsiderCollision(HitboxEntity entity) {
+            if (entity is Fireball) {
+                return false;
+            }
+            return base.ConsiderCollision(entity);
         }
     }
 }

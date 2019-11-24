@@ -41,6 +41,10 @@ namespace Game.Models.Entities
                 canvas.Draw(this._hitboxSprite);
             }
         }
+        
+        public virtual bool ConsiderCollision(HitboxEntity entity) {
+            return true;
+        }
 
         public virtual void OnCollision(HitboxEntity entity) {
 

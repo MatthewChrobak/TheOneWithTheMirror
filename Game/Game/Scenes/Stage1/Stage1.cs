@@ -68,8 +68,9 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("rotateSpeedRing", PriorityType.LOGIC, UpdateSpeedRingAnimation, 100);
 
             this.Events.AddEvent("ant-fireballs", PriorityType.LOGIC, () => {
-
-                foreach (var entity in this.map.GetEntities(entity => entity as Enemy != null)) {
+                var enemies = this.map.GetEntities(entity => entity as Enemy != null).ToArray();
+                for (int i = 0; i < enemies.Length; i++) {
+                    var entity = enemies[i];
                     var enemy = entity as Enemy;
 
                     if (enemy.IsAnt) {
@@ -78,7 +79,14 @@ namespace Game.Scenes.Stage1
                 }
 
                 return ControlEvent.NONE;
-            }, 5000);
+            }, 10);
+            this.Events.AddEvent("ant-fireballs-update", PriorityType.LOGIC, (Func<ControlEvent>)(() => {
+                var fireballs = this.map.GetEntities(entity => entity as Fireball != null).ToArray();
+                for (int i = 0; i < fireballs.Length; i++) {
+                    (fireballs[i] as Fireball).Move();
+                }
+                return ControlEvent.NONE;
+            }), 10);
 
 
             Debug.AddDebugCommand("enablekeys", (data) => {
