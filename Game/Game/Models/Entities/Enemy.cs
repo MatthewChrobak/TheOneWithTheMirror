@@ -6,7 +6,7 @@ using System;
 
 namespace Game.Models
 {
-    public class Enemy : Entity
+    public class Enemy : HitboxEntity
     {
         private readonly SpriteSheetContext _sprite;
         public readonly int enemyMovementSpeed;
@@ -18,7 +18,7 @@ namespace Game.Models
         public const int positionYLowerBound = -5000;
         public const int positionYHigherBound = -5000;
 
-        public Enemy()
+        public Enemy() : base(5, 5, 5, 5)
         {
             this.EntityType = EntityType.Enemy;
             Random random = new Random();
@@ -43,6 +43,7 @@ namespace Game.Models
         public override void Draw(ICanvas canvas)
         {
             canvas.Draw(this._sprite);
+            base.Draw(canvas);
         }
     }
 }

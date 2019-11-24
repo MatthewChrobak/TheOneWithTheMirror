@@ -28,6 +28,8 @@ namespace Game.Scenes.Stage1
         public int MapBrush_Top;
         public int MapBrush_Left;        
         public string MapBrush_Mode = "single";
+        public int enemyCount = 0;
+        public const int  maximumEnemy = 100;
 
 
         public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
@@ -117,7 +119,11 @@ namespace Game.Scenes.Stage1
 
         private ControlEvent AddEnemy()
         {
-            map.AddEntity(new Enemy());
+            if (enemyCount < maximumEnemy)
+            {
+                map.AddEntity(new Enemy());
+                enemyCount++;
+            }
             return ControlEvent.NONE;
         }
 
