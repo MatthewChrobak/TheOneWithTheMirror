@@ -1,4 +1,5 @@
-﻿namespace Game.Models.Entities
+﻿
+namespace Game.Models.Entities
 {
     public enum EntityType
     {
@@ -7,6 +8,11 @@
         Buffs,
         Sword,
         PoisonArrow,
+        Fly,
+        PoisonBow,
+        Shield,
+        RegenPotion,
+        SpeedRing,
         None
     }
 }

@@ -2,37 +2,34 @@
 using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
-using Annex.Scenes;
 using Game.Models.Buffs;
 using Game.Models.Chunks;
 
 namespace Game.Models.Entities.Items
 {
-    public class Sword : Item
+    public class PoisonBow : Item
     {
         public SpriteSheetContext _sprite;
         public TextContext _text;
-        public string _name = "Sword";
+        public String _name = "Poison Bow";
 
-        public Sword()
+        public PoisonBow()
         {
-            this.EntityType = EntityType.Sword;
-            this.buffType = BuffTypes.Damage;
-            this._sprite = new SpriteSheetContext("Sword_Sprite_Sheet.png", 1, 23)
+            this.EntityType = EntityType.PoisonBow;
+            this.buffType = BuffTypes.DOT;
+            this._sprite = new SpriteSheetContext("poison_bow.png", 1, 13)
             {
                 RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, -16)),
-                RenderSize = Vector.Create(32, 32)
+                RenderSize = Vector.Create(40, 40)
             };
 
             //randomize the sword spanning
             System.Random random = new System.Random();
-            var xPosition = random.Next(150, 800);
-            var yPosition = random.Next(150, 600);
-            this.Position.Set(xPosition, yPosition);
+            this.Position.Set(random.Next(Map.Size_X), random.Next(Map.Size_Y));
 
             this._text = new TextContext(this._name, "Default.ttf")
             {
-                RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, 12)),
+                RenderPosition = new OffsetVector(this.Position, Vector.Create(-30, 17)),
                 FontColor = RGBA.White,
                 BorderColor = RGBA.Black,
                 BorderThickness = 2,
