@@ -34,7 +34,7 @@ namespace Game.Models
             Position.X = positionX;
             Position.Y = positionY;
 
-            this._sprite = new SpriteSheetContext("", 25, 20)
+            this._sprite = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
             {
                 RenderPosition = this.Position,
                 RenderSize = Vector.Create(10, 10)

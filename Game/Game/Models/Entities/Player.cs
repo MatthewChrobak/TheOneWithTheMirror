@@ -1,3 +1,4 @@
+using Annex.Data;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
@@ -9,12 +10,12 @@ using System;
 
 namespace Game.Models.Entities
 {
-    public class Player : Entity
+    public class Player : HitboxEntity
     {
         private (int x, int y) LastChunkID = (int.MinValue, int.MinValue);
         public int CurrentXChunkID => (int)Math.Floor(this.Position.X / MapChunk.ChunkWidth);
         public int CurrentYChunkID => (int)Math.Floor(this.Position.Y / MapChunk.ChunkHeight);
-        public event Action<int, int> ChunkLoader;
+        public event Func<HitboxEntity, (float x, float y)> CollisionHandler;
 
         public SpriteSheetContext _sprite;
 
@@ -31,7 +32,7 @@ namespace Game.Models.Entities
 
         public readonly uint _joystickID;
 
-        public Player(uint joystickID) {
+        public Player(uint joystickID) : base(5, 5, 5, 5) {
             this._joystickID = joystickID;
 
             this._sprite = new SpriteSheetContext("smushy.png", 1, 8) {
@@ -44,6 +45,7 @@ namespace Game.Models.Entities
 
         public override void Draw(ICanvas canvas) {
             canvas.Draw(this._sprite);
+            base.Draw(canvas);
         }
 
         private ControlEvent HandlePlayerInput() {
@@ -95,7 +97,12 @@ namespace Game.Models.Entities
             float signX = (this.dx / 100) * speed;
             float signY = (this.dy / 100) * speed;
             this.Position.Add(signX * speed, signY * speed);
-            HasMovedToNewChunk();
+            var collisions = CollisionHandler?.Invoke(this);
+            this.Position.Add(collisions.Value.x, collisions.Value.y);
+            if (collisions.Value.x != 0 || collisions.Value.y != 0) {
+                return ControlEvent.REMOVE;
+            }
+
             return ControlEvent.NONE;
         }
 
@@ -106,19 +113,6 @@ namespace Game.Models.Entities
                 return ControlEvent.REMOVE;
             }
             return ControlEvent.NONE;
-        }
-
-        public void HasMovedToNewChunk() {
-            if (LastChunkID.x != CurrentXChunkID || LastChunkID.y != CurrentYChunkID) {
-                this.LastChunkID = (CurrentXChunkID, CurrentYChunkID);
-
-                int chunkDistance = 0;
-                for (int y = -chunkDistance; y <= chunkDistance; y++) {
-                    for (int x = -chunkDistance; x <= chunkDistance; x++) {
-                        ChunkLoader?.Invoke(CurrentXChunkID + y, CurrentYChunkID + x);
-                    }
-                }
-            }
         }
     }
 }

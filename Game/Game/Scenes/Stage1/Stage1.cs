@@ -12,7 +12,6 @@ using Game.Models.Entities;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
-using System.Collections.Generic;
 
 namespace Game.Scenes.Stage1
 {
@@ -37,8 +36,8 @@ namespace Game.Scenes.Stage1
             players = new Player[4];
 
             this.map = new Map("stage1");
+            this.map.LoadChunk(0, 0);
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
-            this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
 
             //audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
 
@@ -75,8 +74,7 @@ namespace Game.Scenes.Stage1
                         dx += speed;
                     }
 
-                    this.players[debugPlayerID]?.Position.Add(dx, dy);
-                    this.players[debugPlayerID]?.HasMovedToNewChunk();
+                    this.players[0]?.Position.Add(dx, dy);
 
                     return ControlEvent.NONE;
                 }, 10);
@@ -234,7 +232,7 @@ namespace Game.Scenes.Stage1
 
                     var newPlayer = new Player(e.JoystickID);
                     this.players[e.JoystickID] = newPlayer;
-                    this.players[e.JoystickID].ChunkLoader += map.LoadChunk; // Remove event when changing scenes
+                    newPlayer.CollisionHandler += this.map.GetMaximumColllisions;
                     this.map.AddEntity(newPlayer);
 
                     SceneManager.Singleton.LoadScene<CharacterSelection>();
@@ -270,7 +268,7 @@ namespace Game.Scenes.Stage1
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.Insert) {
+            if (e.Key == KeyboardKey.Space) {
                 Debug.ToggleDebugOverlay();
             }
 
@@ -279,6 +277,14 @@ namespace Game.Scenes.Stage1
             if (e.Key == KeyboardKey.Escape) {
                 this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
                     Button = JoystickButton.Back
+                });
+            }
+
+            if(e.Key == KeyboardKey.Tab)
+            {
+                this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent()
+                {
+                    Button = JoystickButton.A
                 });
             }
 
@@ -347,17 +353,6 @@ namespace Game.Scenes.Stage1
                 this.RemoveBrushEvent = true;
             }
 
-        }
-
-        private ControlEvent IsChunkRemovable()
-        {
-            foreach(var player in this.players)
-            {
-                if(player != null)
-                    this.map.UnloadChunk(player.CurrentXChunkID, player.CurrentYChunkID);
-            }
-
-            return ControlEvent.NONE;
         }
     }
 }
