@@ -3,7 +3,6 @@ using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
-using Annex.Scenes;
 using Game.Models.Entities;
 using Game.Models.Entities.Hitboxes;
 using Game.Scenes;
@@ -13,8 +12,13 @@ namespace Game.Models
 {
     public class Enemy : HitboxEntity
     {
+        private readonly SolidRectangleContext _redHealthbar;
+        private readonly SolidRectangleContext _greenHealthbar;
+
         private readonly SpriteSheetContext _sprite;
         public readonly int enemyMovementSpeed;
+
+        public readonly Vector Size;
 
         private long LastAttacked = 0;
 
@@ -27,6 +31,24 @@ namespace Game.Models
 
         public Enemy() : base(10, 10, 10, 10)
         {
+            this.Size = Vector.Create(30, 30);
+
+            var healthbarSize = Vector.Create(50, 5);
+
+            this._greenHealthbar = new SolidRectangleContext(RGBA.Green) {
+                RenderSize = new ScalingVector(healthbarSize, Vector.Create(this.Health.GetPureRatio(), 1)),
+                RenderBorderColor = RGBA.Black,
+                RenderBorderSize = 2,
+                //-25 + 0, -30 -10
+                RenderPosition = new OffsetVector(Position, new OffsetVector(new ScalingVector(healthbarSize, -0.5f, -1), new ScalingVector(Size, 0, -1)))
+            };
+            this._redHealthbar = new SolidRectangleContext(RGBA.Red) {
+                RenderSize = healthbarSize,
+                RenderBorderColor = RGBA.Black,
+                RenderBorderSize = 2,
+                RenderPosition = new OffsetVector(Position, new OffsetVector(new ScalingVector(healthbarSize, -0.5f, -1), new ScalingVector(Size, 0, -1)))
+            };
+
             this.EntityType = EntityType.Enemy;
             Random random = new Random();
             //Generates a random position for the enemy
@@ -44,12 +66,14 @@ namespace Game.Models
             this._sprite = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
             {
                 RenderPosition = new OffsetVector(this.Position, -15, -15),
-                RenderSize = Vector.Create(30, 30)
+                RenderSize = Size
             };
         }
         public override void Draw(ICanvas canvas)
         {
             canvas.Draw(this._sprite);
+            canvas.Draw(this._redHealthbar);
+            canvas.Draw(this._greenHealthbar);
             base.Draw(canvas);
         }
 
