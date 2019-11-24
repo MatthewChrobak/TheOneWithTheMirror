@@ -196,7 +196,7 @@ namespace Game.Models.Entities
         {
             if (entity.EntityType == EntityType.Enemy) 
             {
-                entity.health = 0;
+                entity.Damage(25);
             }
         }
     }

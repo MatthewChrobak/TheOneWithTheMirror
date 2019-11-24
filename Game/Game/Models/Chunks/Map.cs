@@ -74,7 +74,10 @@ namespace Game.Models.Chunks
                 return (maxX, maxY);
             }
 
-            foreach (var otherEntity in this._mapEntities) {
+            var entities = this._mapEntities.ToList();
+            for (int i = 0; i < entities.Count; i++)
+            {
+                var otherEntity = entities[i];
                 if (otherEntity == entity) {
                     continue;
                 }
