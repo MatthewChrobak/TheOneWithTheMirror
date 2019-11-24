@@ -22,7 +22,7 @@ namespace Game.Scenes.Stage1
 
             this.map = new Map();
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
-            this.Events.AddEvent("HandleChunckRemoval", PriorityType.LOGIC, IsChunkRemovable, 10000);
+            this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
         }
 
         public override void Draw(ICanvas canvas)
@@ -104,7 +104,11 @@ namespace Game.Scenes.Stage1
 
         private ControlEvent IsChunkRemovable()
         {
-            this.map.UnloadChunk();
+            foreach(var player in this.players)
+            {
+                if(player != null)
+                    this.map.UnloadChunk(player.CurrentXChunkID, player.CurrentYChunkID);
+            }
 
             return ControlEvent.NONE;
         }
