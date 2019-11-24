@@ -14,6 +14,7 @@ using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
 
+
 namespace Game.Scenes.Stage1
 {
     public class Stage1 : Scene
@@ -27,7 +28,7 @@ namespace Game.Scenes.Stage1
 
         public Stage1() {
             this.Size.Set(500, 500);
-            players = new Player[4];
+            players = new Player[6];
 
             this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
@@ -217,7 +218,9 @@ namespace Game.Scenes.Stage1
 
                     SceneManager.Singleton.LoadScene<CharacterSelection>();
                     var characterSelection = SceneManager.Singleton.CurrentScene as CharacterSelection;
-                    characterSelection.EditingPlayer = this.players[e.JoystickID];  
+                    characterSelection.EditingPlayer = this.players[e.JoystickID];
+
+                    this.AddChild(new PlayerOverlay(newPlayer));
                     
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
                     CameraFocus(newPlayer);
@@ -253,7 +256,7 @@ namespace Game.Scenes.Stage1
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.Space) {
+            if (e.Key == KeyboardKey.Tilde) {
                 Debug.ToggleDebugOverlay();
             }
 
