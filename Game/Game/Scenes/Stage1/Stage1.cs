@@ -23,6 +23,7 @@ namespace Game.Scenes.Stage1
         public string MapBrush_Texture;
         public int MapBrush_Top;
         public int MapBrush_Left;        
+        public string MapBrush_Mode = "single";
 
         public Stage1() {
             players = new Player[4];
@@ -82,6 +83,15 @@ namespace Game.Scenes.Stage1
                 this.MapBrush_Texture = data[0];
                 this.MapBrush_Top = int.Parse(data[1]);
                 this.MapBrush_Left = int.Parse(data[2]);
+            });
+            Debug.AddDebugCommand("setbrushmode", (data) => {
+                this.MapBrush_Mode = data[0].ToLower();
+
+                if (this.MapBrush_Mode == "random") {
+                    for (int i = 1; i < data.Length; i++) {
+                        // TODO:
+                    }
+                }
             });
         }
 

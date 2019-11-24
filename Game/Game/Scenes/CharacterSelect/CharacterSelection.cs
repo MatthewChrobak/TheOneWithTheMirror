@@ -100,6 +100,14 @@ namespace Game.Scenes.CharacterSelect
             }
         }
 
+        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
+            if (e.Key == KeyboardKey.Space) {
+                this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+                    Button = JoystickButton.A
+                });
+            }
+        }
+
         public override void Draw(ICanvas canvas)
         {
             canvas.Draw(characters[index]);                
