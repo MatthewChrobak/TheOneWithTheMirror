@@ -1,5 +1,4 @@
-﻿using System;
-using Annex.Data;
+﻿using Annex.Data;
 using Annex.Data.Shared;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
@@ -8,7 +7,9 @@ namespace Game.Models.Entities
 {
     public class HitboxEntity : Entity
     {
-        protected SolidRectangleContext _hitboxSprite;
+        public SolidRectangleContext _hitboxSprite;
+
+        public static bool RenderHitboxes = false;
 
         private float _left;
         private float _top;
@@ -20,8 +21,7 @@ namespace Game.Models.Entities
         public float RealRight => this.Position.X + this._right;
         public float RealBottom => this.Position.Y + this._bottom;
 
-        public HitboxEntity(uint left, uint top, uint right, uint bottom) {
-
+        public HitboxEntity(Vector position, uint left, uint top, uint right, uint bottom) : base(position) {
             this._left = left;
             this._top = top;
             this._right = right;
@@ -33,26 +33,16 @@ namespace Game.Models.Entities
             };
         }
 
+        public HitboxEntity(uint left, uint top, uint right, uint bottom) : this(null, left, top, right, bottom) {
+        }
+
         public override void Draw(ICanvas canvas) {
-            canvas.Draw(this._hitboxSprite);
-        }
-
-        public virtual void OnCollision(HitboxEntity entity) {
-
-        }
-
-        internal void Damage(int damage)
-        {
-            this.health -= damage;
-
-            if (this.health <= 0)
-            {
-                this.OnDeath();
+            if (RenderHitboxes) {
+                canvas.Draw(this._hitboxSprite);
             }
         }
 
-        public virtual void OnDeath()
-        {
+        public virtual void OnCollision(HitboxEntity entity) {
 
         }
     }

@@ -1,9 +1,12 @@
-﻿using Annex.Data.Shared;
+﻿using Annex.Data;
+using Annex.Data.Shared;
+using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Contexts;
 using Annex.Scenes;
 using Game.Models.Entities;
-using Game.Scenes.Stage1;
+using Game.Models.Entities.Hitboxes;
+using Game.Scenes;
 using System;
 
 namespace Game.Models
@@ -13,6 +16,8 @@ namespace Game.Models
         private readonly SpriteSheetContext _sprite;
         public readonly int enemyMovementSpeed;
 
+        private long LastAttacked = 0;
+
         public const int enemyMovementSpeedLowerBound = 1;
         public const int enemyMovementSpeedHigherBound = 5;
         public const int positionXLowerBound = 0;
@@ -20,10 +25,9 @@ namespace Game.Models
         public const int positionYLowerBound = 0;
         public const int positionYHigherBound = 500;
 
-        public Enemy() : base(5, 5, 5, 5)
+        public Enemy() : base(10, 10, 10, 10)
         {
             this.EntityType = EntityType.Enemy;
-            this.health = 100;
             Random random = new Random();
             //Generates a random position for the enemy
             var positionX = random.Next(positionXLowerBound, positionXHigherBound);
@@ -39,8 +43,8 @@ namespace Game.Models
 
             this._sprite = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
             {
-                RenderPosition = this.Position,
-                RenderSize = Vector.Create(10, 10)
+                RenderPosition = new OffsetVector(this.Position, -15, -15),
+                RenderSize = Vector.Create(30, 30)
             };
         }
         public override void Draw(ICanvas canvas)
@@ -51,19 +55,26 @@ namespace Game.Models
 
         public override void OnDeath()
         {
-            var stage1 = SceneManager.Singleton.CurrentScene as Stage1;
-            var map = stage1.map;
+            var scene = SceneWithMap.CurrentScene;
+            var map = scene.map;
 
             map.RemoveEntity(this);
         }
 
         public override void OnCollision(HitboxEntity entity)
         {
-            //TODO: implement the enemy damage to player.
-            //if (entity.EntityType == EntityType.Player)
-            //{
-            //    entity.Damage(25);
-            //}
+            if (entity is PlayerHitbox playerHitbox) {
+
+                if (EventManager.CurrentTime - LastAttacked < 1000) {
+                    return;
+                }
+                this.LastAttacked = EventManager.CurrentTime;
+
+                playerHitbox.Player.Damage(1);
+
+                var scene = SceneWithMap.CurrentScene;
+                scene.AddScrollingMessage(new ScrollingTextMessage("-1", entity.Position.X, entity.Position.Y, RGBA.Purple));
+            }
         }
     }
 }

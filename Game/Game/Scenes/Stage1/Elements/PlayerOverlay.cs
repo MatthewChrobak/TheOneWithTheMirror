@@ -37,8 +37,11 @@ namespace Game.Scenes.Stage1.Elements
             };
             this._healthbar = new TextureContext("healthbar.png") {
                 RenderPosition = new OffsetVector(GetPosition(), quarterHeight, sixteenthHeight),
-                RenderSize = Vector.Create(width - (quarterHeight + halfHeight), eigthHeight),
-                UseUIView = true
+                RenderSize = new ScalingVector(
+                    Vector.Create(width - (quarterHeight + halfHeight), eigthHeight), 
+                    Vector.Create(player.Health.GetPureRatio(), 1)),
+                UseUIView = true,
+                SourceTextureRect = new IntRect(0, 0, new ScalingInt(3, player.Health.GetRatio()), 50)
             };
             this._healthPercentage = new TextContext("100%", "default.ttf") {
                 RenderPosition = GetPosition(),
@@ -79,6 +82,7 @@ namespace Game.Scenes.Stage1.Elements
         }
 
         public override void Draw(ICanvas canvas) {
+            _healthPercentage.RenderText = $"{_player.Health.GetRatio().Value}%";
             canvas.Draw(this._healthbar);
             canvas.Draw(this._healthPercentage);
             canvas.Draw(this._icon);

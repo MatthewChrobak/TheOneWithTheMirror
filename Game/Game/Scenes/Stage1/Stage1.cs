@@ -1,37 +1,30 @@
 using Annex;
-using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
-using Annex.Graphics.Contexts;
 using Annex.Graphics.Events;
 using Annex.Scenes;
-using Annex.Scenes.Components;
 using Game.Models;
-using Game.Models.Chunks;
 using Game.Models.Entities;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
 using System.Linq;
 
-
 namespace Game.Scenes.Stage1
 {
-    public class Stage1 : Scene
+    public class Stage1 : SceneWithMap
     {
-        public readonly Map map;
         public Player[] players;
         public Enemy[] enemies;
 
         // MAP EDITING TOOLS
         private uint debugPlayerID = 99;
 
-        public Stage1() {
+        public Stage1() : base("stage1") {
             this.Size.Set(500, 500);
             players = new Player[6];
 
-            this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
 
             map.AddEntity(new Enemy());
@@ -88,11 +81,6 @@ namespace Game.Scenes.Stage1
             {
                 map.AddEntity(new Item());
             });
-        }
-
-        public override void Draw(ICanvas canvas) {
-            map.Draw(canvas);
-            base.Draw(canvas);
         }
 
         private ControlEvent AddEnemy()
@@ -215,6 +203,7 @@ namespace Game.Scenes.Stage1
                     var newPlayer = new Player(e.JoystickID);
                     this.players[e.JoystickID] = newPlayer;
                     newPlayer.CollisionHandler += this.map.GetMaximumColllisions;
+                    newPlayer.BorderCollisionHandler += this.map.GetMapBorderCollisions;
                     this.map.AddEntity(newPlayer);
 
                     SceneManager.Singleton.LoadScene<CharacterSelection>();
@@ -230,7 +219,6 @@ namespace Game.Scenes.Stage1
             //attack button
             if (e.Button == JoystickButton.B)
             {
-                this.players[e.JoystickID].Attack(this.players[e.JoystickID].Position.X, this.players[e.JoystickID].Position.Y, this.map.GetEntities(enemy => enemy.EntityType == EntityType.Enemy));
             }
         }
 
@@ -257,7 +245,7 @@ namespace Game.Scenes.Stage1
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.Tilde) {
+            if (e.Key == KeyboardKey.Insert) {
                 Debug.ToggleDebugOverlay();
             }
 
