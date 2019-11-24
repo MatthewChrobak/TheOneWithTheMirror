@@ -1,7 +1,5 @@
-﻿using System;
-using Annex;
+﻿using Annex;
 using Annex.Data.Shared;
-using Annex.Events;
 using Annex.Graphics;
 
 namespace Game.Models.Chunks

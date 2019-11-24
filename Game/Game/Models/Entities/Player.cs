@@ -33,6 +33,7 @@ namespace Game.Models.Entities
         private float dy;
         private int jumpCount = 0;
         private long lastTimeMoved;
+        internal bool isPlayerDead = false;
 
         private double angle;
 
@@ -84,6 +85,10 @@ namespace Game.Models.Entities
             if (!SceneManager.Singleton.IsCurrentScene<Stage1>()) {
                 return ControlEvent.NONE;
             }
+
+            //check if the player is dead
+            if (this.isPlayerDead)
+                return ControlEvent.NONE;
 
             var canvas = GameWindow.Singleton.Canvas;
 
@@ -245,6 +250,18 @@ namespace Game.Models.Entities
                 case Buffs.BuffTypes.COUNT:
                     break;
             }
+        }
+
+        public override void OnDeath()
+        {
+            if(this.Health.Current <= 0)
+            {
+                var scene = SceneWithMap.CurrentScene;
+                var map = scene.map;
+                this.isPlayerDead = true;
+                map.RemoveEntity(this);
+            }
+
         }
     }
 }
