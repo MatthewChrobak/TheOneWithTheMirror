@@ -23,11 +23,14 @@ namespace Game.Models
         private long LastAttacked = 0;
 
         public const int enemyMovementSpeedLowerBound = 1;
-        public const int enemyMovementSpeedHigherBound = 5;
+        public const int enemyMovementSpeedHigherBound = 4;
         public const int positionXLowerBound = 0;
-        public const int positionXHigherBound = 500;
+        public const int positionXHigherBound = 100;
         public const int positionYLowerBound = 0;
-        public const int positionYHigherBound = 500;
+        public const int positionYHigherBound = 100;
+
+
+
 
         public Enemy() : base(10, 10, 10, 10)
         {

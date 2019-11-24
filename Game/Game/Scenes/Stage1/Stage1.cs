@@ -1,4 +1,5 @@
 using Annex;
+using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
@@ -20,7 +21,14 @@ namespace Game.Scenes.Stage1
         public Enemy[] enemies;
 
         // MAP EDITING TOOLS
-        private uint debugPlayerID = 99;
+        private uint debugPlayerID = 0;
+        public string MapBrush_Texture;
+        public int MapBrush_Top;
+        public int MapBrush_Left;        
+        public string MapBrush_Mode = "single";
+        public int enemyCount = 0;
+        public const int  maximumEnemy = 100;
+        public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
 
         public Stage1() : base("stage1") {
             this.Size.Set(500, 500);
@@ -33,7 +41,10 @@ namespace Game.Scenes.Stage1
             map.AddEntity(new Enemy());
             map.AddEntity(new Sword());
 
-            //this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+
+            audio.PlayBufferedAudio("AwesomeMusic.flac", "AwesomeMusic", true, 60);
+
+            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
             this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
 
@@ -90,7 +101,11 @@ namespace Game.Scenes.Stage1
 
         private ControlEvent AddEnemy()
         {
-            map.AddEntity(new Enemy());
+            if (enemyCount < maximumEnemy)
+            {
+                map.AddEntity(new Enemy());
+                enemyCount++;
+            }
             return ControlEvent.NONE;
         }
         private ControlEvent UpdateSwordAnimation()
@@ -170,11 +185,10 @@ namespace Game.Scenes.Stage1
                         var correction = this.map.GetMaximumColllisions(enemy);
                         enemy.Position.Add(correction.x, correction.y);
 
-
-                        if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
-                        {
-                            //audio.PlayAudio("Sharp_Punch.flac");
-                        }
+                        //if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                        //{
+                        //    audio.PlayAudio("Sharp_Punch.flac");
+                        //}
                     }
                 }
             }
