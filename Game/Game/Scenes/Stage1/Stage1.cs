@@ -5,6 +5,7 @@ using Annex.Graphics;
 using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
+using Game.Models;
 using Game.Models.Chunks;
 using Game.Models.Entities;
 using Game.Scenes.CharacterSelect;
@@ -18,6 +19,7 @@ namespace Game.Scenes.Stage1
     {
         public readonly Map map;
         public Player[] players;
+        public Enemy[] enemies;
 
         // MAP EDITING TOOLS
         public string MapBrush_Texture;
@@ -31,6 +33,64 @@ namespace Game.Scenes.Stage1
             this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
             this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
+
+
+
+            for (var i = 0; i < (players.Length - 1); i++)
+            {
+                if (players[i] != null)
+                {
+                    var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
+                    var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
+
+                    var nextPlayerXDifference = currentPlayerXDifference;
+                    var nextPlayerYDifference = currentPlayerYDifference;
+
+                    if (players[i + 1] != null)
+                    {
+                        nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i + 1].Position.X);
+                        nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
+                    }
+
+                    if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) < Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
+                    {
+                        index = i;
+                    }
+                    else
+                    {
+                        index = i + 1;
+                    }
+
+
+                    if (players[index].Position.X > enemy.Position.X)
+                    {
+                        enemy.Position.X += enemy.enemyMovementSpeed;
+                    }
+
+                    if (players[index].Position.X < enemy.Position.X)
+                    {
+                        enemy.Position.X -= enemy.enemyMovementSpeed;
+                    }
+
+                    if (players[index].Position.Y > enemy.Position.Y)
+                    {
+                        enemy.Position.Y += enemy.enemyMovementSpeed;
+                    }
+
+                    if (players[index].Position.Y < enemy.Position.Y)
+                    {
+                        enemy.Position.Y -= enemy.enemyMovementSpeed;
+                    }
+
+
+
+                    if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                    {
+                        audio.PlayAudio("Sharp_Punch.flac");
+                    }
+                }
+            }
+
 
             Debug.AddDebugCommand("savemap", (data) => {
                 map.Save();
