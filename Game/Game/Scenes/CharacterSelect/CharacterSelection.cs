@@ -26,10 +26,10 @@ namespace Game.Scenes.CharacterSelect
         {
             for (int i = 0; i < characters.Length; i++)
             {
-                characters[i] = new SpriteSheetContext("smushy.png", 1, 8)
+                characters[i] = new SpriteSheetContext("Clawdia_Direction_Anim-LeftRightt.png", 2, 8)
                 {
                     //RenderPosition = Vector.Create(GameWindow.RESOLUTION_WIDTH/2, GameWindow.RESOLUTION_HEIGHT/2),
-                    RenderSize = Vector.Create(25, 50)
+                    RenderSize = Vector.Create(32, 32)
                 };
             }
             characters[1] = new SpriteSheetContext("player.png", 4, 4)
@@ -90,7 +90,7 @@ namespace Game.Scenes.CharacterSelect
                 EditingPlayer._sprite = new SpriteSheetContext(selectedCharacter.SourceTextureName, (uint)selectedCharacter.NumRows, (uint)selectedCharacter.NumColumns)
                 {
                     RenderPosition = EditingPlayer.Position,
-                    RenderSize = Vector.Create(25, 50)
+                    RenderSize = Vector.Create(32, 32)
                 };
                 SceneManager.Singleton.LoadScene<Stage1.Stage1>();
             }

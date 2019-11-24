@@ -1,3 +1,4 @@
+using Annex;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
@@ -18,12 +19,12 @@ namespace Game.Models.Entities
 
         public SpriteSheetContext _sprite;
 
-        private int framesBeforeSlowingDown = 5;
+        private int framesBeforeSlowingDown = 7;
         private long slowedFrameIntervals = 50;
 
-        private int jumpFrames = 25;
+        private int jumpFrames = 40;
         private int jumpFrameIntervals = 5;
-        private const float delayBetweenJumps = 500;
+        private const float delayBetweenJumps = 600;
         private float dx;
         private float dy;
         private int jumpCount = 0;
@@ -40,6 +41,7 @@ namespace Game.Models.Entities
             };
 
             EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
+            Debug.AddDebugInformation(() => $"Player {_joystickID} dx: {dx} dy: {dy}");
         }
 
         public override void Draw(ICanvas canvas) {
@@ -51,7 +53,6 @@ namespace Game.Models.Entities
             {
                 return ControlEvent.NONE;
             }
-
 
             var canvas = GameWindow.Singleton.Canvas;
 
@@ -83,7 +84,7 @@ namespace Game.Models.Entities
         private ControlEvent Jump() {
             jumpCount++;
 
-            if (jumpCount == jumpFrames) {
+            if (jumpCount >= jumpFrames) {
                 return ControlEvent.REMOVE;
             } else if (jumpCount >= jumpFrames - framesBeforeSlowingDown) {
                 //var events = Events.GetEvent("Jump");
@@ -95,6 +96,7 @@ namespace Game.Models.Entities
             float signX = (this.dx / 100) * speed;
             float signY = (this.dy / 100) * speed;
             this.Position.Add(signX * speed, signY * speed);
+            
             HasMovedToNewChunk();
             return ControlEvent.NONE;
         }
