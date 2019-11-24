@@ -7,6 +7,9 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <Compile Remove="resources\**" />
+    <EmbeddedResource Remove="resources\**" />
+    <None Remove="resources\**" />
   </ItemGroup>
 
   <ItemGroup>

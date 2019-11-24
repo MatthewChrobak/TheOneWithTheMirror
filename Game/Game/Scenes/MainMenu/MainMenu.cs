@@ -28,18 +28,7 @@ namespace Game.Scenes.MainMenu
             SceneManager.Singleton.LoadScene<GameClosing>();
         }
 
-        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.A) {
-                SceneManager.Singleton.LoadScene<Stage1.Stage1>();
-            }
-
-            base.HandleKeyboardKeyPressed(e);
-
-            if (e.Handled) {
-                return;
-            }
-        }
-
+     
         public override void HandleJoystickButtonPressed(JoystickButtonPressedEvent e) {
             if (e.Button == JoystickButton.A) {
                 SceneManager.Singleton.LoadScene<Stage1.Stage1>(true);
@@ -50,14 +39,19 @@ namespace Game.Scenes.MainMenu
             }
         }
 
-        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.Space) {
-                HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e)
+        {
+            if (e.Key == KeyboardKey.Space)
+            {
+                HandleJoystickButtonPressed(new JoystickButtonPressedEvent()
+                {
                     Button = JoystickButton.A
                 });
             }
-            if (e.Key == KeyboardKey.Escape) {
-                HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+            if (e.Key == KeyboardKey.Escape)
+            {
+                HandleJoystickButtonPressed(new JoystickButtonPressedEvent()
+                {
                     Button = JoystickButton.Back
                 });
             }

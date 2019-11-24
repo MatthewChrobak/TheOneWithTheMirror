@@ -41,7 +41,7 @@ namespace Game.Scenes.Stage1
 
         public Stage1()
         {
-                players = new Player[4];
+                players = new Game.Models.Entities.Player[4];
                 audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
 
             this.map = new Map("stage1");
@@ -53,77 +53,7 @@ namespace Game.Scenes.Stage1
             this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
 
-            //events.AddEvent(PriorityType.LOGIC, () =
-            //{
-            //    //var enemyList = new List<Enemy>();
-
-            //    ////Add the first enemy
-            //    //var t = new Enemy();
-            //    //enemyList.Add(t);
-
-
-            //    if (players != null)
-            //    {
-            //        if (enemyCounter < maximumEnemy)
-            //        {
-            //            var t = new Enemy();
-            //            map.AddEntity(new Enemy());
-            //            enemyCounter++;
-            //        }
-
-
-            //        foreach (var enemy in map.)
-            //        {
-            //            var index = 0;
-
-            //            for (var i = 0; i < (players.Length - 1); i++)
-            //            {
-            //                var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
-            //                var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
-            //                var nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
-            //                var nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
-
-            //                if (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) > Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference))
-            //                {
-            //                    index = i;
-            //                }
-            //                else
-            //                {
-            //                    index = i + 1;
-            //                }
-            //            }
-
-            //            if (players[index].Position.X > enemy.Position.X)
-            //            {
-            //                enemy.Position.X += enemy.enemyMovementSpeed;
-            //            }
-
-            //            if (players[index].Position.X < enemy.Position.X)
-            //            {
-            //                enemy.Position.X -= enemy.enemyMovementSpeed;
-            //            }
-
-            //            if (players[index].Position.Y > enemy.Position.Y)
-            //            {
-            //                enemy.Position.Y += enemy.enemyMovementSpeed;
-            //            }
-
-            //            if (players[index].Position.Y < enemy.Position.Y)
-            //            {
-            //                enemy.Position.Y -= enemy.enemyMovementSpeed;
-            //            }
-
-            //            if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
-            //            {
-            //                audio.PlayAudio("Sharp_Punch.flac");
-            //            }
-
-            //        }
-            //    }
-
-            //    return ControlEvent.NONE;
-            //}, 1000);
-
+          
         }
 
         private ControlEvent AddEnemy()
