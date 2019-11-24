@@ -1,4 +1,5 @@
 ﻿using Annex.Events;
+using Annex.Graphics;
 using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
@@ -9,7 +10,9 @@ namespace Game.Scenes.MainMenu
     public class MainMenu : Scene
     {
         public MainMenu() {
-            this.AddChild(new SplashTitle());
+            this.ImageTextureName.Set("splash.png");
+            this.Size.Set(GameWindow.RESOLUTION_WIDTH, GameWindow.RESOLUTION_HEIGHT);
+
             var subTitle = new SubTitle();
 
             this.Events.AddEvent("", PriorityType.ANIMATION, () => {
