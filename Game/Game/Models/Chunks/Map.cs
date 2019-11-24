@@ -11,22 +11,27 @@ namespace Game.Models.Chunks
     public class Map : IDrawableObject
     {
         private TextureContext _background;
-        public const int Size_X = 500;
-        public const int Size_Y = 500;
+        private TextureContext _arenaWalls;
+        public const int Size_X = 1077;
+        public const int Size_Y = 852;
         private HashSet<Entity> _mapEntities;
         public readonly string Name;
 
         public Map(string name) {
             this.Name = name;
             this._mapEntities = new HashSet<Entity>();
-            this._background = new TextureContext("Grassy-Tiles.png") {
-                SourceTextureRect = new IntRect(64, 64, 32, 32),
+            this._background = new TextureContext("ArenaGround.png") {
+                RenderSize = Vector.Create(Size_X, Size_Y)
+            };
+            this._arenaWalls = new TextureContext("ArenaWalls.png")
+            {
                 RenderSize = Vector.Create(Size_X, Size_Y)
             };
         }
 
         public void Draw(ICanvas canvas) {
             canvas.Draw(this._background);
+            canvas.Draw(this._arenaWalls);
             foreach (var entity in this.GetOrderedEntities()) {
                 entity.Draw(canvas);
             }
@@ -57,20 +62,22 @@ namespace Game.Models.Chunks
             float x = 0;
             float y = 0;
 
-            if (entity.RealLeft < 0) {
-                x = -entity.RealLeft;
+            if (entity.RealLeft < 125) {
+                x = -entity.RealLeft + 125;
             }
-            if (entity.RealTop < 0) {
-                y = -entity.RealTop;
+            if (entity.RealTop < 200) {
+                y = -entity.RealTop + 200;
             }
-            if (entity.RealRight >= Map.Size_X) {
-                x = -(entity.RealRight - Map.Size_X);
+            if (entity.RealRight >= Map.Size_X -125)
+            {
+                x = -(entity.RealRight - (Map.Size_X - 125));
             }
-            if (entity.RealBottom >= Map.Size_Y) {
-                y = -(entity.RealBottom - Map.Size_Y);
+            if (entity.RealBottom >= Map.Size_Y - 150)
+            {
+                y = -(entity.RealBottom - (Map.Size_Y - 150));
             }
 
-             return (x, y);
+            return (x, y);
         }
 
         public (float x, float y) GetMaximumColllisions(HitboxEntity entity) {

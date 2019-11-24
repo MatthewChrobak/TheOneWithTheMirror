@@ -46,7 +46,6 @@ namespace Game.Models.Entities
             this.hitbox = new PlayerHitbox(this, 10, 10, 10, 10);
             AddHitboxToMap(this.hitbox);
 
-
             var scene = SceneWithMap.CurrentScene;
             scene.Events.AddEvent($"KeyboardInput-{joystickID}", PriorityType.INPUT, HandlePlayerInput, 10, 0);
             Debug.AddDebugInformation(() => $"Player {_joystickID} dx: {dx} dy: {dy}");

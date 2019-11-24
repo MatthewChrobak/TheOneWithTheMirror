@@ -24,7 +24,9 @@ namespace Game.Models.Entities.Items
 
             //randomize the sword spanning
             System.Random random = new System.Random();
-            this.Position.Set(random.Next(Map.Size_X), random.Next(Map.Size_Y));
+            var xPosition = random.Next(150, 800);
+            var yPosition = random.Next(150, 600);
+            this.Position.Set(xPosition, yPosition);
 
             this._text = new TextContext(this._name, "Default.ttf")
             {

@@ -28,6 +28,9 @@ namespace Game.Scenes.Stage1
         public string MapBrush_Mode = "single";
         public int enemyCount = 0;
         public const int  maximumEnemy = 100;
+
+        //Spawn rate in milliseconds
+        public const int enemySpawnRate = 5000;
         public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
 
         public Stage1() : base("stage1") {
@@ -44,7 +47,7 @@ namespace Game.Scenes.Stage1
 
             audio.PlayBufferedAudio("AwesomeMusic.flac", "AwesomeMusic", true, 60);
 
-            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, enemySpawnRate);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
             this.Events.AddEvent("rotateSword", PriorityType.LOGIC, UpdateSwordAnimation, 100);
 

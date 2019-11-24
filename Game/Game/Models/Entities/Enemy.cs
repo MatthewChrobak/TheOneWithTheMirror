@@ -20,10 +20,11 @@ namespace Game.Models
 
         public const int enemyMovementSpeedLowerBound = 1;
         public const int enemyMovementSpeedHigherBound = 4;
-        public const int positionXLowerBound = 0;
-        public const int positionXHigherBound = 100;
-        public const int positionYLowerBound = 0;
-        public const int positionYHigherBound = 100;
+        //Spawn the enemy inside of the arena =/
+        public const int positionXLowerBound = 150;
+        public const int positionXHigherBound = 800;
+        public const int positionYLowerBound = 150;
+        public const int positionYHigherBound = 600;
 
 
 
