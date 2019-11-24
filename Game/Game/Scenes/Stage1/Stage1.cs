@@ -30,6 +30,7 @@ namespace Game.Scenes.Stage1
 
             this.map = new Map("stage1");
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
+            this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
 
             Debug.AddDebugCommand("savemap", (data) => {
                 map.Save();
