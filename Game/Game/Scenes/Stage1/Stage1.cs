@@ -34,6 +34,8 @@ namespace Game.Scenes.Stage1
             this.Size.Set(500, 500);
             players = new Player[6];
 
+            PlayerOverlay.NumOverlays = 0;
+
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
 
             map.AddEntity(new Enemy());
