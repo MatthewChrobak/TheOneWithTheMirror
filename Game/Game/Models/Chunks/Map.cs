@@ -1,5 +1,6 @@
 ﻿using Annex.Graphics;
 using Game.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,6 +43,15 @@ namespace Game.Models.Chunks
             foreach (var entry in this._chunks) {
                 Json.SaveChunk(GetChunkFile(entry.Key.x, entry.Key.y), entry.Value);
             }
+        }
+
+        public IEnumerable<Entity> GetEntities(Func<Entity, bool> cmp = null)
+        {
+            if (cmp == null)
+            {
+                return this._mapEntities;
+            }
+            return this._mapEntities.Where(cmp);
         }
 
         public void LoadChunk(int x, int y) {

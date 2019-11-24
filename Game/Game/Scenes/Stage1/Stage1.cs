@@ -24,10 +24,14 @@ namespace Game.Scenes.Stage1
 
 
         // MAP EDITING TOOLS
+        private uint debugPlayerID = 99;
         public string MapBrush_Texture;
         public int MapBrush_Top;
         public int MapBrush_Left;        
         public string MapBrush_Mode = "single";
+
+
+        public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
 
         public Stage1() {
             players = new Player[4];
@@ -71,8 +75,8 @@ namespace Game.Scenes.Stage1
                         dx += speed;
                     }
 
-                    this.players[0]?.Position.Add(dx, dy);
-                    this.players[0]?.HasMovedToNewChunk();
+                    this.players[debugPlayerID]?.Position.Add(dx, dy);
+                    this.players[debugPlayerID]?.HasMovedToNewChunk();
 
                     return ControlEvent.NONE;
                 }, 10);
@@ -85,9 +89,10 @@ namespace Game.Scenes.Stage1
                 this.players[id]?.Position.Set(x, y);
             });
             Debug.AddDebugCommand("newplayer", (data) => {
+                debugPlayerID = uint.Parse(data[0]);
                 this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
                     Button = JoystickButton.A,
-                    JoystickID = 0
+                    JoystickID = debugPlayerID
                 });
             });
 
@@ -130,13 +135,15 @@ namespace Game.Scenes.Stage1
                 var playerList = map.GetEntities(entity => entity.EntityType == EntityType.Player);
 
 
-                for (var i = 0; i < (players.Length - 1); i++)
+                for (var i = 0; i < (players.Length - 2); i++)
                 {
                     if (players[i] != null)
                     {
+                        //Get the current player's X-Y position
                         var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
                         var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
 
+                        //Get the next player's X-Y position
                         var nextPlayerXDifference = currentPlayerXDifference;
                         var nextPlayerYDifference = currentPlayerYDifference;
 
@@ -146,7 +153,9 @@ namespace Game.Scenes.Stage1
                             nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
                         }
 
-                        if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) < Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
+
+                        //Find the shortest distance between an enemy and the players
+                        if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) <= Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
                         {
                             index = i;
                         }
