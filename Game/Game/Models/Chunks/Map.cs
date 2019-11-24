@@ -99,6 +99,10 @@ namespace Game.Models.Chunks
                     continue;
                 }
 
+                if (!other.ConsiderCollision(entity) && !entity.ConsiderCollision(other)) {
+                    continue;
+                }
+
                 float x = 0;
                 float y = 0;
                 bool xCollision = false;
