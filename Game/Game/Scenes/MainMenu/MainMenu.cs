@@ -32,5 +32,18 @@ namespace Game.Scenes.MainMenu
                 this.HandleCloseButtonPressed();
             }
         }
+
+        public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
+            if (e.Key == KeyboardKey.Space) {
+                HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+                    Button = JoystickButton.A
+                });
+            }
+            if (e.Key == KeyboardKey.Escape) {
+                HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
+                    Button = JoystickButton.Back
+                });
+            }
+        }
     }
 }
