@@ -37,6 +37,8 @@ namespace Game.Models.Entities
 
         public readonly uint _joystickID;
 
+        public Dictionary<Buffs.BuffTypes, int> buffs;
+
         public Player(uint joystickID) : base(5, 5, 5, 5) {
             this._joystickID = joystickID;
             this.health = 100;
@@ -48,6 +50,8 @@ namespace Game.Models.Entities
             EventManager.Singleton.AddEvent(PriorityType.INPUT, HandlePlayerInput, 10, 0, "KeyboardInput");
             Debug.AddDebugInformation(() => $"Player {_joystickID} dx: {dx} dy: {dy}");
             Debug.AddDebugInformation(() => $"Angle: {angle}");
+
+            buffs = new Dictionary<Buffs.BuffTypes, int>();
         }
 
         public override void Draw(ICanvas canvas) {
@@ -73,16 +77,22 @@ namespace Game.Models.Entities
             }
 
             long time = EventManager.CurrentTime;
+            
+            int buffStack = 0;
+            if(!buffs.TryGetValue(Buffs.BuffTypes.Speed, out buffStack))
+            {
+                buffs.Add(Buffs.BuffTypes.Speed, 0);
+            }            
 
-            if (time > lastTimeMoved + delayBetweenJumps) {
+            if (time > lastTimeMoved + (delayBetweenJumps * (1 - 0.05 * buffStack ))) {
                 this.dx = dx;
                 this.dy = dy;
                 this.jumpCount = 0;
                 var events = EventManager.Singleton;
                 events.AddEvent(PriorityType.ANIMATION, Jump, jumpFrameIntervals, 0, "Jump");
                 lastTimeMoved = time;
-
-                events.AddEvent(PriorityType.ANIMATION, UpdateAnimation, (int)delayBetweenJumps / 10);
+                                
+                events.AddEvent(PriorityType.ANIMATION, UpdateAnimation, (int)delayBetweenJumps / 10);                
             }
 
             return ControlEvent.NONE;
@@ -129,61 +139,43 @@ namespace Game.Models.Entities
             //right
             if(angle >= 337.5 || angle < 22.5)
             {
-
+                this._sprite.SetRow(2);
             }
             //bottom right
-            else if (angle >= 22.5 || angle < 67.5)
+            else if (angle >= 22.5 && angle < 67.5)
             {
-
+                this._sprite.SetRow(3);
             }
             //down
-            else if(angle >= 67.5 || angle < 112.5)
+            else if(angle >= 67.5 && angle < 112.5)
             {
-
+                this._sprite.SetRow(4);
             }
             //bottom left
-            else if(angle >= 112.5 || angle < 157.5)
+            else if(angle >= 112.5 && angle < 157.5)
             {
-
+                this._sprite.SetRow(5);
             }
             //left
-            else if(angle >= 157.5 || angle < 202.5)
+            else if(angle >= 157.5 && angle < 202.5)
             {
-
+                this._sprite.SetRow(6);
             }
             //top left
-            else if(angle >= 202.5 || angle < 247.5)
+            else if(angle >= 202.5 && angle < 247.5)
             {
-
+                this._sprite.SetRow(7);
             }
             //up
-            else if(angle >= 247.5 || angle < 292.5)
+            else if(angle >= 247.5 && angle < 292.5)
             {
-
+                this._sprite.SetRow(0);
             }
             //top right
-            else if(angle >= 292.5 || angle < 337.5)
+            else if(angle >= 292.5 && angle < 337.5)
             {
-
+                this._sprite.SetRow(1);
             }
-
-
-            //left
-            if(dx < - 50)
-            {
-                if (this._sprite.Row % 2 == 1)
-                {
-                    this._sprite.StepRow();
-                }                
-            }
-            //right
-            else if(dx > 50)
-            {                
-                if(this._sprite.Row % 2 == 0)
-                {
-                    this._sprite.StepRow();
-                }                
-            }            
         }
 
         public void Attack(float x, float y, IEnumerable<Entity> entity)
@@ -197,6 +189,15 @@ namespace Game.Models.Entities
             if (entity.EntityType == EntityType.Enemy) 
             {
                 entity.health = 0;
+            }
+
+            if(entity is Item item)
+            {
+                int stack = 0;
+                if(buffs.TryGetValue(item.buffType, out stack))
+                {
+
+                }
             }
         }
     }

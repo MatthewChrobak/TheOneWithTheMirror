@@ -34,7 +34,7 @@ namespace Game.Scenes.Stage1
 
             map.AddEntity(new Enemy());
 
-            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+            //this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
             this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
 
             Debug.AddDebugCommand("enablekeys", (data) => {
