@@ -38,7 +38,7 @@ namespace Game.Models.Entities
         private HitboxEntity hitbox;
 
         public readonly uint _joystickID;
-        public Dictionary<Buffs.BuffTypes, int> buffs;
+        private Dictionary<Buffs.BuffTypes, int> buffs;
 
         public Player(uint joystickID) {
             this._joystickID = joystickID;
@@ -196,20 +196,16 @@ namespace Game.Models.Entities
             }
         }
 
-        public void GetBuff(BuffTypes type)
+        public bool GetBuff(BuffTypes types) {
+            return this.buffs.TryGetValue(types, out _) ? true : false;
+        }
+
+        public void SetBuff(BuffTypes type)
         {
-            int stack = 0;            
             switch (type)
             {
                 case Buffs.BuffTypes.Damage:
-                    if(buffs.TryGetValue(type, out stack))
-                    {
-                        buffs[type] = stack++;
-                    }
-                    else
-                    {
-                        buffs[type] = 1;
-                    }
+                    this.buffs.Add(BuffTypes.Damage, (int)BuffTypes.Damage);
                     break;
                 case Buffs.BuffTypes.Defense:
                     break;
@@ -230,10 +226,13 @@ namespace Game.Models.Entities
                 case Buffs.BuffTypes.DOT:
                     break;
                 case Buffs.BuffTypes.Regen:
+                    this.buffs.Add(BuffTypes.Regen, (int)BuffTypes.Regen);
                     break;
                 case Buffs.BuffTypes.Lifesteal:
+                    this.buffs.Add(BuffTypes.Lifesteal, (int)BuffTypes.Lifesteal);
                     break;
                 case Buffs.BuffTypes.Shield:
+                    this.buffs.Add(BuffTypes.Shield, (int)BuffTypes.Shield);
                     break;
                 case Buffs.BuffTypes.COUNT:
                     break;

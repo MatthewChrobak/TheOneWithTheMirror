@@ -5,20 +5,19 @@ using Annex.Graphics.Contexts;
 using Annex.Scenes;
 using Game.Models.Buffs;
 using Game.Models.Chunks;
-
 namespace Game.Models.Entities.Items
 {
-    public class Sword : Item
+    public class RegenPotion : Item
     {
         public SpriteSheetContext _sprite;
         public TextContext _text;
-        public string _name = "Sword";
+        public string _name = "Regen Potion";
 
-        public Sword()
+        public RegenPotion()
         {
-            this.EntityType = EntityType.Sword;
-            this.buffType = BuffTypes.Damage;
-            this._sprite = new SpriteSheetContext("Sword_Sprite_Sheet.png", 1, 23)
+            this.EntityType = EntityType.RegenPotion;
+            this.buffType = BuffTypes.Regen;
+            this._sprite = new SpriteSheetContext("regen_potion.png", 1, 10)
             {
                 RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, -16)),
                 RenderSize = Vector.Create(32, 32)
@@ -30,7 +29,7 @@ namespace Game.Models.Entities.Items
 
             this._text = new TextContext(this._name, "Default.ttf")
             {
-                RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, 12)),
+                RenderPosition = new OffsetVector(this.Position, Vector.Create(-30, 17)),
                 FontColor = RGBA.White,
                 BorderColor = RGBA.Black,
                 BorderThickness = 2,

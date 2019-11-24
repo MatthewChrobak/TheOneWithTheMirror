@@ -6,7 +6,9 @@
         Enemy,
         Buffs,
         Sword,
-        PoisonArrow,
+        PoisonBow,
+        Shield,
+        RegenPotion,
         None
     }
 }
