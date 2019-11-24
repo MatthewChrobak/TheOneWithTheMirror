@@ -10,10 +10,8 @@ namespace Game.Models.Chunks
     {
         public int X, Y;
 
-        public long lastTimeUsed = EventManager.CurrentTime;
-
-        public const int X_Tiles = 10;
-        public const int Y_Tiles = 10;
+        public const int X_Tiles = 50;
+        public const int Y_Tiles = 50;
 
         public const int ChunkHeight = Y_Tiles * Tile.TileHeight;
         public const int ChunkWidth = X_Tiles * Tile.TileWidth;

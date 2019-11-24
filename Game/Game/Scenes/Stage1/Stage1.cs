@@ -1,16 +1,17 @@
 using Annex;
+using Annex.Audio;
 using Annex.Data.Shared;
 using Annex.Events;
 using Annex.Graphics;
 using Annex.Graphics.Events;
 using Annex.Scenes;
 using Annex.Scenes.Components;
+using Game.Models;
 using Game.Models.Chunks;
 using Game.Models.Entities;
 using Game.Scenes.CharacterSelect;
 using Game.Scenes.Stage1.Elements;
 using System;
-using System.Collections.Generic;
 
 namespace Game.Scenes.Stage1
 {
@@ -18,19 +19,32 @@ namespace Game.Scenes.Stage1
     {
         public readonly Map map;
         public Player[] players;
+        public Enemy[] enemies;
+
 
         // MAP EDITING TOOLS
+        private uint debugPlayerID = 99;
         public string MapBrush_Texture;
         public int MapBrush_Top;
         public int MapBrush_Left;        
         public string MapBrush_Mode = "single";
 
+
+        public Annex.Audio.Players.IAudioPlayer audio = AudioManager.Singleton;
+
         public Stage1() {
             players = new Player[4];
 
             this.map = new Map("stage1");
+            this.map.LoadChunk(0, 0);
             this.Events.AddEvent("HandleNewConnections", PriorityType.INPUT, CheckForNewInput, 5000, 500);
-            this.Events.AddEvent("IsChunkRemovable", PriorityType.LOGIC, IsChunkRemovable, 5000);
+
+            //audio.PlayBufferedAudio("AwesomeMusic.flac", "test", true, 100);
+
+            map.AddEntity(new Enemy());
+
+            this.Events.AddEvent("add-new-enemy", PriorityType.LOGIC, AddEnemy, 1000);
+            this.Events.AddEvent("update-enemy-positions", PriorityType.LOGIC, UpdateEnemyPositions, 20);
 
             Debug.AddDebugCommand("savemap", (data) => {
                 map.Save();
@@ -61,7 +75,6 @@ namespace Game.Scenes.Stage1
                     }
 
                     this.players[0]?.Position.Add(dx, dy);
-                    this.players[0]?.HasMovedToNewChunk();
 
                     return ControlEvent.NONE;
                 }, 10);
@@ -74,9 +87,10 @@ namespace Game.Scenes.Stage1
                 this.players[id]?.Position.Set(x, y);
             });
             Debug.AddDebugCommand("newplayer", (data) => {
+                debugPlayerID = uint.Parse(data[0]);
                 this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
                     Button = JoystickButton.A,
-                    JoystickID = 0
+                    JoystickID = debugPlayerID
                 });
             });
 
@@ -106,7 +120,89 @@ namespace Game.Scenes.Stage1
             base.Draw(canvas);
         }
 
+        private ControlEvent AddEnemy()
+        {
+            map.AddEntity(new Enemy());
+            return ControlEvent.NONE;
+        }
+
+        private ControlEvent UpdateEnemyPositions()
+        {
+
+            foreach (var entity in map.GetEntities(entity => entity.EntityType == EntityType.Enemy))
+            {
+                var enemy = entity as Enemy;
+
+                var index = 0;
+
+                var playerList = map.GetEntities(entity => entity.EntityType == EntityType.Player);
+
+
+                for (var i = 0; i < (players.Length - 2); i++)
+                {
+                    if (players[i] != null)
+                    {
+                        //Get the current player's X-Y position
+                        var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
+                        var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
+
+                        //Get the next player's X-Y position
+                        var nextPlayerXDifference = currentPlayerXDifference;
+                        var nextPlayerYDifference = currentPlayerYDifference;
+
+                        if (players[i + 1] != null)
+                        {
+                            nextPlayerXDifference = Math.Abs(enemy.Position.X - players[i + 1].Position.X);
+                            nextPlayerYDifference = Math.Abs(enemy.Position.Y - players[i + 1].Position.Y);
+                        }
+
+
+                        //Find the shortest distance between an enemy and the players
+                        if (players[i + 1] == null || (Math.Sqrt(currentPlayerXDifference * currentPlayerXDifference + currentPlayerYDifference * currentPlayerYDifference) <= Math.Sqrt(nextPlayerXDifference * nextPlayerXDifference + nextPlayerYDifference * nextPlayerYDifference)))
+                        {
+                            index = i;
+                        }
+                        else
+                        {
+                            index = i + 1;
+                        }
+
+
+                        if (players[index].Position.X > enemy.Position.X)
+                        {
+                            enemy.Position.X += enemy.enemyMovementSpeed;
+                        }
+
+                        if (players[index].Position.X < enemy.Position.X)
+                        {
+                            enemy.Position.X -= enemy.enemyMovementSpeed;
+                        }
+
+                        if (players[index].Position.Y > enemy.Position.Y)
+                        {
+                            enemy.Position.Y += enemy.enemyMovementSpeed;
+                        }
+
+                        if (players[index].Position.Y < enemy.Position.Y)
+                        {
+                            enemy.Position.Y -= enemy.enemyMovementSpeed;
+                        }
+
+
+
+                        if (players[index].Position.Y == enemy.Position.Y && players[index].Position.X == enemy.Position.X)
+                        {
+                            audio.PlayAudio("Sharp_Punch.flac");
+                        }
+                    }
+                }
+            }
+
+            return ControlEvent.NONE;
+        }
+
         private ControlEvent CheckForNewInput() {
+
             var canvas = GameWindow.Singleton.Canvas;
 
             for (uint i = 0; i < 4; i++) {
@@ -141,7 +237,7 @@ namespace Game.Scenes.Stage1
 
                     var newPlayer = new Player(e.JoystickID);
                     this.players[e.JoystickID] = newPlayer;
-                    this.players[e.JoystickID].ChunkLoader += map.LoadChunk; // Remove event when changing scenes
+                    newPlayer.CollisionHandler += this.map.GetMaximumColllisions;
                     this.map.AddEntity(newPlayer);
 
                     SceneManager.Singleton.LoadScene<CharacterSelection>();
@@ -177,7 +273,7 @@ namespace Game.Scenes.Stage1
         }
 
         public override void HandleKeyboardKeyPressed(KeyboardKeyPressedEvent e) {
-            if (e.Key == KeyboardKey.Insert) {
+            if (e.Key == KeyboardKey.Space) {
                 Debug.ToggleDebugOverlay();
             }
 
@@ -186,6 +282,14 @@ namespace Game.Scenes.Stage1
             if (e.Key == KeyboardKey.Escape) {
                 this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent() {
                     Button = JoystickButton.Back
+                });
+            }
+
+            if(e.Key == KeyboardKey.Tab)
+            {
+                this.HandleJoystickButtonPressed(new JoystickButtonPressedEvent()
+                {
+                    Button = JoystickButton.A
                 });
             }
 
@@ -254,17 +358,6 @@ namespace Game.Scenes.Stage1
                 this.RemoveBrushEvent = true;
             }
 
-        }
-
-        private ControlEvent IsChunkRemovable()
-        {
-            foreach(var player in this.players)
-            {
-                if(player != null)
-                    this.map.UnloadChunk(player.CurrentXChunkID, player.CurrentYChunkID);
-            }
-
-            return ControlEvent.NONE;
         }
     }
 }
