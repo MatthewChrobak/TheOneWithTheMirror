@@ -13,7 +13,7 @@ namespace Game.Models.Entities.Items
         public TextContext _text;
         public String _name = "Poison Bow";
 
-        public PoisonBow()
+        public PoisonBow() : base()
         {
             this.EntityType = EntityType.PoisonBow;
             this.buffType = BuffTypes.DOT;
@@ -22,10 +22,6 @@ namespace Game.Models.Entities.Items
                 RenderPosition = new OffsetVector(this.Position, Vector.Create(-16, -16)),
                 RenderSize = Vector.Create(40, 40)
             };
-
-            //randomize the sword spanning
-            System.Random random = new System.Random();
-            this.Position.Set(random.Next(Map.Size_X), random.Next(Map.Size_Y));
 
             this._text = new TextContext(this._name, "Default.ttf")
             {

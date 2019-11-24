@@ -13,7 +13,7 @@ namespace Game.Models.Entities.Items
         public TextContext _text;
         public String _name = "Speed Ring";
 
-        public SpeedRing()
+        public SpeedRing() : base()
         {
             this.EntityType = EntityType.SpeedRing;
             this.buffType = BuffTypes.Speed;
@@ -23,10 +23,6 @@ namespace Game.Models.Entities.Items
                 RenderSize = Vector.Create(40, 40)
             };
 
-            //randomize the sword spanning
-            System.Random random = new System.Random();
-            this.Position.Set(random.Next(Map.Size_X), random.Next(Map.Size_Y));
-
             this._text = new TextContext(this._name, "Default.ttf")
             {
                 RenderPosition = new OffsetVector(this.Position, Vector.Create(-30, 17)),
@@ -34,7 +30,7 @@ namespace Game.Models.Entities.Items
                 BorderColor = RGBA.Black,
                 BorderThickness = 2,
                 FontSize = 12
-            };
+            };            
         }
 
         public override void Draw(ICanvas canvas)

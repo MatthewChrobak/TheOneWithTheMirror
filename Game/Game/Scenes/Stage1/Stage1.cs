@@ -304,7 +304,10 @@ namespace Game.Scenes.Stage1
                     var characterSelection = SceneManager.Singleton.CurrentScene as CharacterSelection;
                     characterSelection.EditingPlayer = this.players[e.JoystickID];
 
-                    this.AddChild(new PlayerOverlay(newPlayer));
+                    PlayerOverlay overlay = new PlayerOverlay(newPlayer);
+                    this.AddChild(overlay);
+                    newPlayer.overlay = overlay;
+
 
                     Debug.AddDebugInformation(() => $"Player {e.JoystickID} - X: {(int)newPlayer.Position.X} Y: {(int)newPlayer.Position.Y}");
                     CameraFocus(newPlayer);

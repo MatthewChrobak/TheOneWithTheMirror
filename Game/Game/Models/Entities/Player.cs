@@ -8,6 +8,7 @@ using Game.Models.Chunks;
 using Game.Models.Entities.Hitboxes;
 using Game.Scenes;
 using Game.Scenes.Stage1;
+using Game.Scenes.Stage1.Elements;
 using System;
 using System.Collections.Generic;
 
@@ -39,6 +40,8 @@ namespace Game.Models.Entities
 
         public readonly uint _joystickID;
         private Dictionary<Buffs.BuffTypes, int> buffs;
+
+        public PlayerOverlay overlay;
         
         public Player(uint joystickID) {
             this._joystickID = joystickID;
@@ -210,7 +213,7 @@ namespace Game.Models.Entities
         {
             buffs.TryGetValue(type, out int stack);
             //false default value 0
-            if(stack == 0)
+            if(stack == 0 && !this.buffs.ContainsKey(type))
             {
                 this.buffs.Add(type, ++stack);
             }
@@ -233,13 +236,8 @@ namespace Game.Models.Entities
                     break;
                 case Buffs.BuffTypes.Splash:
                     break;
-                case Buffs.BuffTypes.DOT:
-                    break;
                 case Buffs.BuffTypes.Regen:                    
                     this.Health.Regen.Value = this.Health.Maximum * 0.01f * stack;                    
-                    break;
-                case Buffs.BuffTypes.Lifesteal:
-                    //this.buffs.Add(BuffTypes.Lifesteal, (int)BuffTypes.Lifesteal);
                     break;
                 case Buffs.BuffTypes.Shield:
                     //this.buffs.Add(BuffTypes.Shield, (int)BuffTypes.Shield);

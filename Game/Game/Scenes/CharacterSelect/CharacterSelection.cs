@@ -28,23 +28,15 @@ namespace Game.Scenes.CharacterSelect
             {
                 characters[i] = new SpriteSheetContext("Clawdia_Direction_Anim-Sheet.png", 8, 8)
                 {                    
-                    RenderSize = Vector.Create(64, 64)
+                    RenderSize = Vector.Create(64, 64),                    
                 };
-            }
-            characters[1] = new SpriteSheetContext("player.png", 4, 4)
-            {                
-                RenderSize = Vector.Create(96, 96)
-            };
 
-            characters[2] = new SpriteSheetContext("Clawdia_FacingUpUp.png", 1, 1)
-            {                
-                RenderSize = Vector.Create(32, 32)
-            };
-
-            characters[3] = new SpriteSheetContext("Clawdia_DirectionSheet.png", 3, 3)
-            {
-                RenderSize = Vector.Create(32, 32)
-        };
+                //don't tint the first character
+                if(i > 0)
+                {
+                    characters[i].RenderColor = new Annex.Data.RGBA((byte)RNG.Next(255), (byte)RNG.Next(255), (byte)RNG.Next(255));
+                }
+            }           
             
             this.Events.AddEvent("ChooseCharacter", PriorityType.INPUT, ChooseCharacter, 500);
         }
@@ -87,8 +79,12 @@ namespace Game.Scenes.CharacterSelect
                 EditingPlayer._sprite = new SpriteSheetContext(selectedCharacter.SourceTextureName, (uint)selectedCharacter.NumRows, (uint)selectedCharacter.NumColumns)
                 {
                     RenderPosition = new OffsetVector(EditingPlayer.Position, Vector.Create(-32, -32)),
-                    RenderSize = Vector.Create(64, 64)
-                };
+                    RenderSize = Vector.Create(64, 64),
+                    RenderColor = selectedCharacter.RenderColor
+                };                
+
+                EditingPlayer.overlay.SetColors(selectedCharacter.RenderColor);
+
                 SceneManager.Singleton.LoadScene<Stage1.Stage1>();
             }
             if (e.Button == JoystickButton.Back)

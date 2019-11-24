@@ -44,7 +44,7 @@ namespace Game.Scenes.Stage1.Elements
             this._icon = new TextureContext("Icon-1.png") {
                 RenderPosition = GetPosition(),
                 RenderSize = Vector.Create(width, height),
-                UseUIView = true
+                UseUIView = true,               
             };
             this._healthPercentage = new TextContext("100%", "default.ttf") {
                 RenderPosition = GetPosition(),
@@ -90,6 +90,12 @@ namespace Game.Scenes.Stage1.Elements
             canvas.Draw(this._healthbar);
             canvas.Draw(this._healthPercentage);
             canvas.Draw(this._icon);
+        }
+
+        public void SetColors(RGBA color)
+        {
+            this._border.RenderColor = color;
+            this._icon.RenderColor = color;
         }
     }
 }
