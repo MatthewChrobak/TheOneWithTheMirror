@@ -23,10 +23,7 @@ namespace Game.Models.Entities
 
         public void Damage(int damage, int modifier = 0) {
             this.Health.Current.Value -= (damage + modifier);
-
-            if (this.Health.Current.Value <= 0) {
-                this.OnDeath();
-            }
+            this.OnDeath();
         }
 
         public virtual void OnDeath() {

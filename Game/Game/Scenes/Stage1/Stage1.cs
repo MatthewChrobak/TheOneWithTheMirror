@@ -199,7 +199,7 @@ namespace Game.Scenes.Stage1
                     var playerList = map.GetEntities(entity => entity.EntityType == EntityType.Player);
 
                     for (var i = 0; i < (players.Length - 2); i++) {
-                        if (players[i] != null) {
+                        if (players[i] != null && !players[i].isPlayerDead) {
                             //Get the current player's X-Y position
                             var currentPlayerXDifference = Math.Abs(enemy.Position.X - players[i].Position.X);
                             var currentPlayerYDifference = Math.Abs(enemy.Position.Y - players[i].Position.Y);
